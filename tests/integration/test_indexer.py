@@ -38,7 +38,7 @@ from data.indexer import (
 from db.models import Article, ArticleEmbedding
 
 
-# ─── Фикстуры ─────────────────────────────────────────────────────────────────
+# Фикстуры для настройки тестовой базы данных и сессий SQLAlchemy
 
 @pytest.fixture
 async def test_engine():
@@ -99,7 +99,7 @@ async def clean_db(session_factory):
         await s.commit()
 
 
-# ─── Ollama Embedding ─────────────────────────────────────────────────────────
+# Ollama Embedding 
 
 async def test_get_embedding_shape():
     vector = await _get_embedding("machine learning")
@@ -121,7 +121,7 @@ async def test_get_embedding_different_texts():
     assert not np.allclose(v1, v2)
 
 
-# ─── PostgreSQL ───────────────────────────────────────────────────────────────
+# PostgreSQL 
 
 async def test_article_exists_not_found(session):
     result = await _article_exists(session, "9999.99999")
@@ -166,7 +166,7 @@ async def test_save_embedding_fields(session):
     assert emb.model_version == _EMBEDDING_MODEL_NAME
 
 
-# ─── FAISS ────────────────────────────────────────────────────────────────────
+# FAISS 
 
 async def test_faiss_create():
     index = _load_or_create_faiss_index()
@@ -185,7 +185,7 @@ async def test_faiss_save_and_reload():
     assert Path(settings.faiss_index_path).exists()
 
 
-# ─── index_articles ───────────────────────────────────────────────────────────
+# index_articles 
 
 async def test_index_articles_empty():
     stats = await index_articles([])
@@ -229,7 +229,7 @@ async def test_index_articles_deduplication(session_factory):
     assert count == 1
 
 
-# ─── run_indexing ─────────────────────────────────────────────────────────────
+# run_indexing 
 
 async def test_run_indexing_categories(session_factory):
     await clean_db(session_factory)
