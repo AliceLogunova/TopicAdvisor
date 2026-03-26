@@ -15,8 +15,10 @@ db/session.py — настройка подключения к PostgreSQL (SQLAl
     - core/pipeline.py — запись запросов и тем в БД
 """
 
-from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
+
+from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -31,6 +33,8 @@ from db.models import Base
 engine = create_async_engine(
     settings.postgres_url,
     echo=False,
+    poolclass=NullPool,
+    pool_pre_ping=True,
 )
 
 # Фабрика сессий — создаёт новые сессии для каждого запроса
@@ -42,19 +46,21 @@ _AsyncSessionFactory = async_sessionmaker(
 )
 
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    """Асинхронный генератор сессий для работы с БД.
+@asynccontextmanager
+async def get_session():
+    """Асинхронный контекстный менеджер сессий для работы с БД.
+
+    Использование:
+        async with get_session() as session:
+            result = await session.execute(...)
     """
     async with _AsyncSessionFactory() as session:
         try:
             yield session
-            # Сохранить все изменения если не было ошибок
             await session.commit()
         except Exception:
-            # Откатить все изменения если произошла ошибка
             await session.rollback()
             raise
-
 
 async def create_tables() -> None:
     """Создать все таблицы в БД если они не существуют.
