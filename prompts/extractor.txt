@@ -2,13 +2,13 @@ You are a scientific paper analyst. Extract structured facts from the abstract b
 
 Return ONLY a valid JSON object with exactly these fields. No explanations, no markdown, no extra text.
 
-{
+{{
     "problem": "The main problem or challenge this paper addresses",
     "gap": "What is missing or limited in existing work, what this paper improves",
     "methods": ["list all methods and techniques mentioned, each as a separate string"],
     "datasets": ["list all datasets mentioned, each as a separate string"],
     "metrics": ["list all evaluation metrics mentioned, each as a separate string"]
-}
+}}
 
 If a field has no information in the abstract, use null for strings and [] for arrays.
 
