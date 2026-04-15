@@ -61,7 +61,7 @@ def _build_context(articles: list[dict]) -> str:
         abstract = article.get("abstract", "")[:1000] # ограничиваем длину абстракта
         facts = article.get("facts")
 
-        part = f"[{i}] {title}\nURL: {url}\nAbstract: {abstract}"
+        part = f"[{i}] {title}\nSOURCE URL (use this in sources field): {url}\nAbstract: {abstract}"
 
         if facts:
             if facts.get("problem"):

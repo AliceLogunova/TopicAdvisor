@@ -5,13 +5,15 @@ Based on the research papers and extracted facts below, generate {num_topics} sp
 Academic level: {level}
 Project duration: {duration} months
 
+IMPORTANT: You MUST include at least 2-3 datasets and 3-4 arXiv source URLs per topic. Use URLs from the papers provided in context.
+
 For each topic return a JSON object with exactly these fields:
 {{
     "title": "Specific, clear topic title (1 sentence)",
     "rationale": "Why this topic is relevant now, based on gaps in the papers (4-5 sentences)",
     "approach": "Suggested research approach and methods (2-3 sentences)",
-    "datasets": ["list all relevant datasets, minimum 2-3, each as a separate string"],
-    "sources": ["list arXiv URLs of source papers, minimum 3-4, each as a separate string"]
+    "datasets": ["dataset 1", "dataset 2", "dataset 3"],
+    "sources": ["https://arxiv.org/abs/...", "https://arxiv.org/abs/...", "https://arxiv.org/abs/...", "https://arxiv.org/abs/..."]
 }}
 
 Return ONLY a JSON array of topic objects. No explanations, no markdown, no extra text.
