@@ -38,8 +38,8 @@ SEPARATOR = "=" * 70
 
 
 async def main():
-    query = "я студент бакалавр, меня интересует NLP, трансформеры и машинное обучение. Проект на 5 месяцев"
-    level = "bachelor"
+    query = "я студент магистр, меня интересует CV и Speech processing. Проект на 5 месяцев"
+    level = "master"
     duration = 5
 
     print(f"\n{SEPARATOR}")

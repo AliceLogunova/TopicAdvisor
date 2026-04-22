@@ -59,6 +59,7 @@ def _parse_subqueries(response_text: str) -> list[str]:
 
     # Фильтруем пустые строки
     subqueries = [q.strip() for q in result if isinstance(q, str) and q.strip()]
+    subqueries = subqueries[:15]  # Ограничиваем максимум 15 подзапросами
     return subqueries
 
 

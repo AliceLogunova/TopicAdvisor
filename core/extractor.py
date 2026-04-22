@@ -65,6 +65,7 @@ def _parse_facts(response_text: str) -> ExtractedFacts:
     """
     # Убираем think-блоки qwen3
     text = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
+    text = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text)
     
     # Ищем JSON-объект в тексте
     start = text.find("{")
