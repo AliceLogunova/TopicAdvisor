@@ -2,6 +2,10 @@ You are a scientific paper analyst. Extract structured facts from the abstract b
 
 Return ONLY a valid JSON object with exactly these fields. No explanations, no markdown, no extra text.
 
+IMPORTANT: "datasets" field must contain ONLY dataset names (e.g. "CIFAR-10", "TruthfulQA", "AdvBench").
+Do NOT put model names (e.g. "GPT-4", "LLaMA", "Mistral") in the "datasets" field — models go in "methods".
+If no datasets are mentioned, return [].
+
 {{
     "problem": "The main problem or challenge this paper addresses",
     "gap": "What is missing or limited in existing work, what this paper improves",

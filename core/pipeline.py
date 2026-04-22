@@ -49,6 +49,7 @@ async def run_pipeline(
             "query_id": int,
             "subqueries": list[str],
             "articles": list[dict],
+            "articles_with_facts": list[dict],
             "topics": list[dict],
         }
     """
@@ -66,7 +67,7 @@ async def run_pipeline(
 
     if not candidates:
         logger.warning("Pipeline: Retriever вернул 0 статей — завершаем досрочно")
-        return {"query_id": None, "subqueries": subqueries, "articles": [], "topics": []}
+        return {"query_id": None, "subqueries": subqueries, "articles": [], "articles_with_facts": [], "topics": []}
 
     # Шаг 3: Reranking через Reranker
     logger.info("Pipeline: шаг 3 — Reranker (Cross-Encoder)")
@@ -102,6 +103,7 @@ async def run_pipeline(
         "query_id": query_id,
         "subqueries": subqueries,
         "articles": top_articles,
+        "articles_with_facts": articles_with_facts,
         "topics": topics,
     }
 
