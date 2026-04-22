@@ -14,7 +14,7 @@ data/indexer.py — индексация статей arXiv в PostgreSQL и FAI
     6. Персистировать FAISS-индекс на диск
 
 Используется в:
-    - CLI: uv run python data/indexer.py --categories cs.AI --total 1000
+    - CLI: uv run python data.indexer.py --categories cs.AI --total 1000
     - core/retriever.py читает FAISS-индекс который создаёт этот файл
 """
 
