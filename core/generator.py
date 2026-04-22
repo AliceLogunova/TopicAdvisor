@@ -58,7 +58,8 @@ def _build_context(articles: list[dict]) -> str:
     for i, article in enumerate(articles, 1):
         title = article.get("title", "")
         url = article.get("url", "")
-        abstract = article.get("abstract", "")[:1000] # ограничиваем длину абстракта
+        max_abstract = 300 if len(articles) <= 5 else 200 if len(articles) <= 10 else 150  # обрезаем абстракты
+        abstract = article.get("abstract", "")[:max_abstract]
         facts = article.get("facts")
 
         part = f"[{i}] {title}\nSOURCE URL (use this in sources field): {url}\nAbstract: {abstract}"
@@ -83,15 +84,14 @@ def _build_context(articles: list[dict]) -> str:
 def _parse_topics(response_text: str) -> list[GeneratedTopic]:
     """Распарсить JSON-массив тем из ответа LLM."""
     text = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
+    text = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text)
 
-    # Попытка 1 — ищем массив [...] 
     start = text.find("[")
     end = text.rfind("]") + 1
-    
+
     if start != -1 and end > 0:
         json_str = text[start:end]
     else:
-        # Попытка 2 — модель вернула объекты подряд, оборачиваем в массив
         objects = re.findall(r'\{[^{}]*\}', text, re.DOTALL)
         if not objects:
             raise ValueError(f"JSON-массив не найден в ответе: {text[:200]}")
@@ -102,7 +102,22 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
         raise ValueError(f"Ожидался список тем, получено: {type(data)}")
 
     topics = [GeneratedTopic(**item) for item in data if isinstance(item, dict)]
-    return topics
+
+    # Фильтруем темы без источников
+    topics = [t for t in topics if t.sources]
+    # Фильтруем темы без источников И без датасетов — они невалидны
+    topics = [t for t in topics if t.sources and t.datasets]
+
+    # Убираем дубликаты по заголовку (case-insensitive, первые 60 символов)
+    seen_titles: set[str] = set()
+    unique_topics = []
+    for t in topics:
+        title_key = t.title.strip().lower()[:60]
+        if title_key not in seen_titles:
+            seen_titles.add(title_key)
+            unique_topics.append(t)
+
+    return unique_topics
 
 
 # Основная функция для генерации тем ВКР. Принимает список статей с фактами, параметры уровня и срока, желаемое количество тем. 
@@ -145,15 +160,18 @@ async def generate_topics(
                 messages=[{"role": "user", "content": prompt}],
                 options={
                     "temperature": 0.5,
-                    "num_predict": 4096,  
+                    "num_predict": 6144,  
                     },
                 think=False,
             )
             response_text = response["message"]["content"]
             topics = _parse_topics(response_text)
 
+            topics = _parse_topics(response_text)
             if not topics:
-                raise ValueError("Получен пустой список тем")
+                raise ValueError(
+                    "Все темы невалидны (нет источников\датасетов или все дубликаты) — повторяем"
+                )
 
             logger.info(
                 f"Generator: сгенерировано {len(topics)} тем "

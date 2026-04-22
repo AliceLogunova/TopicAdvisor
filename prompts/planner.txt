@@ -11,6 +11,7 @@ Project duration: {duration} months
 Rules:
 - Each subquery must be a short English phrase (3-8 words) suitable for arXiv search
 - Cover different angles: methods, applications, datasets, benchmarks, recent advances
-- Cover diverse research fields as relevant to the user's query (Computer Science, Biology, Finance, Engineering, Physics, Mathimatics, Statistics, Economics, etc.)
+- Cover diverse research fields as relevant to the user's query (Computer Science, Biology, Finance, Engineering, Physics, Mathematics, Statistics, Economics, etc.)
 - Output ONLY a JSON array of strings, no explanations, no markdown
 - Example format: ["subquery one", "subquery two", "subquery three"]
+- Generate exactly 10-12 search queries, no more.
