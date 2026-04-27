@@ -35,7 +35,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ─── Тестовые запросы ─────────────────────────────────────────────────────────
+# Тестовые запросы 
 # 3 запроса × 3 предметных области × 3 значения top_k = 27 прогонов
 # Каждая область содержит короткие (1-5 слов) и длинные (20+ слов) запросы
 
@@ -70,7 +70,7 @@ QUERIES = {
 TOP_K_VALUES = [5, 10, 15]
 
 
-# ─── Машинные метрики ─────────────────────────────────────────────────────────
+# Машинные метрики — автоматические оценки качества по результатам прогонов
 
 def compute_coverage_rate(subqueries: list[str], domain: str) -> float:
     """Coverage Rate через regex — для одного прогона."""
@@ -222,7 +222,7 @@ def compute_topic_coherence(results: list[dict]) -> float:
     return round(float(np.mean(scores)) if scores else 0.0, 4)
 
 
-# ─── Основной прогон ──────────────────────────────────────────────────────────
+# Основной прогон — запускаем пайплайн для каждого запроса и собираем результаты с метриками
 
 async def run_single_query(query: str, domain: str, top_k: int) -> dict:
     """Запустить пайплайн для одного запроса и вернуть результат с метриками."""
@@ -310,7 +310,7 @@ async def main():
                 result = await run_single_query(query, domain, top_k)
                 all_results.append(result)
 
-                # ── Красивый вывод тем в консоль ──────────────────────────
+                # Красивый вывод тем в консоль для быстрой оценки результатов
                 topics = result.get("topics", [])
                 sep = "─" * 70
                 print(f"\n{'=' * 70}")
@@ -335,14 +335,14 @@ async def main():
                             for src in t["sources"]:
                                 print(f"    • {src}")
                 else:
-                    print("  ⚠ Темы не сгенерированы")
+                    print(" Темы не сгенерированы")
                 print()
 
                 # Сохраняем после каждого запроса (на случай прерывания)
                 with open("eval_results.json", "w", encoding="utf-8") as f:
                     json.dump(all_results, f, ensure_ascii=False, indent=2)
 
-    # ─── Агрегированные машинные метрики ──────────────────────────────────────
+    # Агрегированные машинные метрики 
     logger.info("\nВычисляем агрегированные метрики...")
 
     summary = {
