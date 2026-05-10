@@ -44,6 +44,7 @@ class TopicsRequest(BaseModel):
         description="Желаемое количество тем на выходе",
         example=6,
     )
+    locale: str = "ru"
 
 
 # Исходящие ответы 

@@ -12,6 +12,7 @@ core/pipeline.py — оркестратор RAG-пайплайна
 """
 
 import json
+import locale
 import logging
 
 from core.extractor import extract_facts
@@ -25,6 +26,10 @@ from db.session import get_session
 logger = logging.getLogger(__name__)
 
 
+def _detect_query_locale(query: str) -> str:
+    """Определить язык запроса: ru если есть кириллица, иначе en."""
+    return "ru" if any("а" <= ch.lower() <= "я" or ch.lower() == "ё" for ch in query) else "en"
+
 async def run_pipeline(
     query: str,
     level: str = "master",
@@ -32,6 +37,8 @@ async def run_pipeline(
     num_topics: int = 6,
     retriever_top_k: int = 50,
     reranker_top_k: int = 10,
+    locale: str = "ru", 
+    user_id: int | None = None,
 ) -> dict:
     """Запустить полный RAG-пайплайн от запроса до тем.
 
@@ -42,6 +49,7 @@ async def run_pipeline(
         num_topics:     Желаемое количество тем на выходе
         retriever_top_k: Количество кандидатов после FAISS
         reranker_top_k:  Количество статей после Reranker
+        locale:         Язык для генерации (ru/en)
 
     Returns:
         Словарь с результатами:
@@ -54,6 +62,10 @@ async def run_pipeline(
         }
     """
     logger.info(f"Pipeline: запуск для запроса: {query!r}")
+
+    # Автоматическое определение языка запроса
+    locale = _detect_query_locale(query)
+    logger.info(f"Pipeline: определён язык запроса: {locale}")
 
     # Шаг 1: Query Expansion через Planner
     logger.info("Pipeline: шаг 1 — Planner (Query Expansion)")
@@ -79,6 +91,11 @@ async def run_pipeline(
     articles_with_facts = await extract_facts(top_articles)
     logger.info("Pipeline: факты извлечены")
 
+    # Логируем статьи с фактами для диагностики
+    logger.info(f"Pipeline: статей с фактами для Generator: {len(articles_with_facts)}")
+    for a in articles_with_facts:
+        logger.info(f"  - {a.get('arxiv_id', '?')}: {a.get('title', '')[:60]}")
+
     # Шаг 5: Topic Generation через Generator
     logger.info("Pipeline: шаг 5 — Generator (LLM)")
     topics = await generate_topics(
@@ -86,6 +103,7 @@ async def run_pipeline(
         level=level,
         duration=duration,
         num_topics=num_topics,
+        locale=locale, 
     )
     logger.info(f"Pipeline: сгенерировано {len(topics)} тем")
 
@@ -96,6 +114,8 @@ async def run_pipeline(
         level=level,
         duration=duration,
         topics=topics,
+        user_id=user_id,
+        locale=locale,
     )
 
     logger.info(f"Pipeline: завершён, query_id={query_id}")
@@ -114,6 +134,8 @@ async def _save_results(
     level: str,
     duration: int,
     topics: list[dict],
+    user_id: int | None = None,
+    locale: str = "ru",
 ) -> int | None:
     """Сохранить запрос и темы в PostgreSQL.
 
@@ -128,7 +150,8 @@ async def _save_results(
                 expanded_queries_json=json.dumps(subqueries, ensure_ascii=False),
                 level=level,
                 term=duration,
-                locale="ru",
+                locale=locale,
+                user_id=user_id,
             )
             session.add(user_query)
             await session.flush()

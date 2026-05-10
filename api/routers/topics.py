@@ -17,6 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.deps import get_db
+from api.routers.auth import get_current_user
 from api.schemas import (
     ArticleResponse,
     TopicResponse,
@@ -24,7 +25,7 @@ from api.schemas import (
     TopicsResponse,
 )
 from core.pipeline import run_pipeline
-from db.models import GeneratedTopic, UserQuery
+from db.models import GeneratedTopic, User, UserQuery
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,10 @@ router = APIRouter(prefix="/topics", tags=["topics"])
     summary="Сгенерировать темы ВКР",
     description="Запускает полный RAG-пайплайн и возвращает список тем с обоснованием",
 )
-async def generate_topics(request: TopicsRequest) -> TopicsResponse:
+async def generate_topics(
+    request: TopicsRequest,
+    current_user: User = Depends(get_current_user),
+) -> TopicsResponse:
     """Основной эндпоинт — запускает пайплайн от запроса до тем."""
     logger.info(f"POST /topics: query={request.query!r}, level={request.level}")
 
@@ -49,6 +53,8 @@ async def generate_topics(request: TopicsRequest) -> TopicsResponse:
             level=request.level,
             duration=request.duration,
             num_topics=request.num_topics,
+            locale=request.locale,
+            user_id=current_user.id,
         )
     except Exception as e:
         logger.error(f"POST /topics: пайплайн завершился с ошибкой: {e}")
@@ -91,18 +97,15 @@ async def generate_topics(request: TopicsRequest) -> TopicsResponse:
     )
 
 
-@router.get(
-    "/history",
-    summary="История запросов",
-    description="Возвращает список последних запросов из БД",
-)
+@router.get("/history")
 async def get_history(
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),  
 ) -> list[dict]:
-    """Получить историю запросов пользователей из PostgreSQL."""
     result = await db.execute(
         select(UserQuery)
+        .where(UserQuery.user_id == current_user.id)  
         .order_by(UserQuery.created_at.desc())
         .limit(limit)
     )

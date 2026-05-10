@@ -158,6 +158,9 @@ class UserQuery(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
 
+    # Ссылка на пользователя, который создал запрос
+    user_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=True)  # ← добавить
+
     # Исходный текст запроса пользователя
     query_text: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -216,3 +219,24 @@ class GeneratedTopic(Base):
 
     # Обратная связь с запросом пользователя
     query: Mapped["UserQuery"] = relationship(back_populates="topics")
+
+
+class User(Base):
+    """Пользователи системы для аутентификации через JWT.
+    Хранит email, хэш пароля и язык интерфейса."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+
+    # Уникальный email пользователя, используется для входа
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+
+    # Хэш пароля, не храню plain-text пароль по соображениям безопасности
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    # Язык интерфейса пользователя (ru или en), по умолчанию ru
+    locale: Mapped[str] = mapped_column(String(10), nullable=True, default="ru")
+
+    # Дата и время регистрации пользователя
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

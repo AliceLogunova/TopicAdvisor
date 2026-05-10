@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "title": "TopicAdvisor",
+    "history": "History",
+    "logout": "Sign out"
+  },
+  "home": {
+    "hero": "Find Your Research Topic",
+    "subtitle": "An intelligent system for discovering promising research directions based on the latest arXiv publications",
+    "placeholder": "Describe your interests, field of study, and research goals...",
+    "example": "e.g. I'm interested in NLP and transformers, want to explore text summarization",
+    "submit": "Find Topics",
+    "level_label": "Academic Level",
+    "duration_label": "Project Duration (months)",
+    "topics_label": "Number of Topics",
+    "levels": {
+      "bachelor": "Bachelor",
+      "master": "Master",
+      "phd": "PhD",
+      "postdoc": "Postdoc"
+    }
+  },
+  "progress": {
+    "planner": "Expanding your query...",
+    "retriever": "Searching papers...",
+    "reranker": "Ranking results...",
+    "extractor": "Extracting insights...",
+    "generator": "Generating topics..."
+  },
+  "topics": {
+    "rationale": "Why now",
+    "approach": "Approach",
+    "datasets": "Datasets",
+    "sources": "Sources",
+    "articles_found": "Articles found",
+    "subqueries": "Search queries",
+    "empty": "No topics found. Try rephrasing your query."
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "submit_login": "Sign In",
+    "submit_register": "Create Account",
+    "switch_to_register": "No account? Sign up",
+    "switch_to_login": "Already have an account? Sign in"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "auth": "Invalid email or password"
+  }
+}

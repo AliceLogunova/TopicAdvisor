@@ -70,3 +70,8 @@ async def create_tables() -> None:
     """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+async def get_db():
+    """FastAPI dependency — открывает сессию для одного запроса."""
+    async with _AsyncSessionFactory() as session:
+        yield session

@@ -5,8 +5,13 @@ Based on the research papers and extracted facts below, generate {num_topics} sp
 Academic level: {level}
 Project duration: {duration} months
 
+CRITICAL: Do NOT summarize or rephrase any single paper. 
+Instead, SYNTHESIZE a NEW research direction that COMBINES gaps, methods, or datasets from MULTIPLE papers.
+The topic title must describe research that does NOT yet exist in the provided papers.
+Use papers only as evidence/motivation, not as the topic itself.
+
 CRITICAL REQUIREMENT: Every topic MUST have "approach" field filled and MUST have at least 2-3 sources from the URLs listed above. 
-Topics without sources or approach will be rejected.
+Topics without sources or approach will be rejected. Topics with 0 or 1 source will be rejected.
 
 CRITICAL DOMAIN REQUIREMENT: Every topic MUST strictly belong to the same research domain as the user's original query. 
 Do NOT suggest topics from unrelated fields. If a paper in the context is from a different field, use it only as a supporting reference, 
@@ -17,6 +22,11 @@ NEVER put arXiv URLs or paper titles in the "datasets" field.
 If no specific datasets are mentioned in the papers, invent plausible dataset names relevant to the topic (e.g. "synthetic benchmark dataset", "domain-specific evaluation corpus").
 Model names (OPT-125M, LLaMA, Mistral, GPT-4 etc.) are NOT datasets. If only model names are available, 
 write instead: ["evaluation on language model outputs", "model-generated text corpus"].
+
+CRITICAL LANGUAGE REQUIREMENT: Generate ALL text fields (title, rationale, approach, datasets) 
+in {locale} language. If locale is "ru" — write in Russian. If locale is "en" — write in English.
+
+CRITICAL TOPICS COUNT: Generate EXACTLY {num_topics} topics, no more, no less.
 
 For each topic return a JSON object with exactly these fields:
 {{

@@ -116,8 +116,17 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
         if title_key not in seen_titles:
             seen_titles.add(title_key)
             unique_topics.append(t)
+    
+    # Дедупликация источников в каждой теме
+    for t in unique_topics:
+        t.sources = list(dict.fromkeys(t.sources))
 
-    return unique_topics
+    # Фильтруем темы с менее чем 2 источниками
+    filtered = [t for t in unique_topics if len(t.sources) >= 2]
+
+    # Если все отфильтровались — вернуть как есть (лучше 1 тема чем ничего)
+    return filtered if filtered else unique_topics
+
 
 
 # Основная функция для генерации тем ВКР. Принимает список статей с фактами, параметры уровня и срока, желаемое количество тем. 
@@ -128,6 +137,7 @@ async def generate_topics(
     level: str = "master",
     duration: int = 3,
     num_topics: int = _DEFAULT_NUM_TOPICS,
+    locale: str = "ru",
 ) -> list[dict]:
     """Сгенерировать темы ВКР на основе статей и извлечённых фактов.
 
@@ -151,13 +161,32 @@ async def generate_topics(
         level=level,
         duration=duration,
         context=context,
+        locale=locale,
+    )
+
+    language_name = "Russian" if locale == "ru" else "English"
+
+    system_message = (
+        f"You are a strict JSON generator. "
+        f"All natural-language values in the JSON response MUST be written in {language_name}. "
+        f"Do not use any other language. "
+        f"Keep only technical names, dataset names, model names and URLs unchanged."
+    )
+
+    prompt = (
+        f"FINAL LANGUAGE REQUIREMENT: Write title, rationale, approach and dataset descriptions "
+        f"strictly in {language_name}. Do not copy English wording from abstracts unless it is a technical term.\n\n"
+        + prompt
     )
 
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
             response = ollama.chat(
                 model=settings.ollama_model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt},
+                    ],
                 options={
                     "temperature": 0.5,
                     "num_predict": 6144,  

@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'uvKits';
+  src: url('/fonts/uvKits.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Глобальные CSS-переменные (меняй здесь для всех страниц) */
+:root {
+  --bg:        #0d1b2e;               /* фон всех страниц           */
+  --bg-card:   #15254b;               /* фон карточек и инпутов     */
+  --text:      #dce8f8;               /* основной цвет текста       */
+  --text-dim:  rgba(147, 197, 253, 0.6); /* приглушённый текст      */
+  --accent:    #3b82f6;               /* акцентный синий            */
+  --border:    rgba(96, 165, 250, 0.25); /* цвет рамок              */
+  --font-size: 17px;                  /* базовый размер шрифта      */
+}
+
+/* Глобальные стили */
+*, *::before, *::after {
+  font-family: 'uvKits', 'JetBrains Mono', 'Fira Code', monospace;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+body {
+  color: var(--text);
+  font-family: 'uvKits', 'JetBrains Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Все страницы используют одинаковый фон */
+.page-bg {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Карточки */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+/* Инпуты */
+input, textarea, select {
+  background-color: var(--bg-card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  font-family: inherit !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(147, 197, 253, 0.3) !important;
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.2);
+  border-radius: 2px;
+}

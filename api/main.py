@@ -21,6 +21,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import topics
 from api.schemas import HealthResponse
 
+from api.routers import auth, topics
+
 logger = logging.getLogger(__name__)
 
 # Создание приложения FastAPI
@@ -46,6 +48,7 @@ app.add_middleware(
 # Роутеры — подключаем эндпоинты из разных модулей
 
 app.include_router(topics.router)
+app.include_router(auth.router)
 
 # Системные эндпоинты — корневой и health check
 
