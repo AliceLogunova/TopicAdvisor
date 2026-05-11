@@ -17,9 +17,14 @@ CRITICAL DOMAIN REQUIREMENT: Every topic MUST strictly belong to the same resear
 Do NOT suggest topics from unrelated fields. If a paper in the context is from a different field, use it only as a supporting reference, 
 not as the main subject of a topic.
 
-CRITICAL DATASETS REQUIREMENT: The "datasets" field must contain ONLY dataset names (e.g. "CIFAR-10", "ImageNet", "GLUE", "SQuAD").
+CRITICAL DATASETS REQUIREMENT: The "datasets" field must contain ONLY dataset names that are 
+EXPLICITLY mentioned in the papers above (in the Abstract, Datasets fields provided).
 NEVER put arXiv URLs or paper titles in the "datasets" field.
-If no specific datasets are mentioned in the papers, invent plausible dataset names relevant to the topic (e.g. "synthetic benchmark dataset", "domain-specific evaluation corpus").
+Do NOT invent dataset names. Do NOT use datasets from your training knowledge (e.g. CIFAR-10, 
+TruthfulQA, AdvBench, ImageNet) unless they appear in the papers above.
+If no specific datasets are mentioned in the papers, use ONLY generic descriptive names relevant to the topic domain (e.g. "recommendation benchmark dataset", 
+"user interaction logs corpus", "synthetic evaluation dataset"). Do NOT use real dataset names like CIFAR-10, TruthfulQA, 
+ImageNet, AdvBench — these are hallucinations unless they explicitly appear in the papers above.
 Model names (OPT-125M, LLaMA, Mistral, GPT-4 etc.) are NOT datasets. If only model names are available, 
 write instead: ["evaluation on language model outputs", "model-generated text corpus"].
 
