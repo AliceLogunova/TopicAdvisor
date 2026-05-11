@@ -38,9 +38,9 @@ SEPARATOR = "=" * 70
 
 
 async def main():
-    query = "я студент магистр, меня интересует CV и Speech processing. Проект на 5 месяцев"
-    level = "master"
-    duration = 5
+    query = "Методы обнаружения атак на основе поведенческого анализа в распределённых системах"
+    level = "phd"
+    duration = 6
 
     print(f"\n{SEPARATOR}")
     print("E2E ТЕСТ: ПОЛНЫЙ RAG-ПАЙПЛАЙН")
@@ -54,7 +54,8 @@ async def main():
         query=query,
         level=level,
         duration=duration,
-        num_topics=5,
+        num_topics=6,
+        locale="ru",
     )
 
     # Вывод результатов 

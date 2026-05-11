@@ -22,7 +22,7 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 _PROMPT_PATH = Path("prompts/generator.txt")
-_MAX_RETRIES = 3
+_MAX_RETRIES = 5
 _DEFAULT_NUM_TOPICS = 6
 
 # Pydantic-схема для одной сгенерированной темы ВКР, которая включает в себя название, обоснование, подход, датасеты и источники.
@@ -58,7 +58,7 @@ def _build_context(articles: list[dict]) -> str:
     for i, article in enumerate(articles, 1):
         title = article.get("title", "")
         url = article.get("url", "")
-        max_abstract = 300 if len(articles) <= 5 else 200 if len(articles) <= 10 else 150  # обрезаем абстракты
+        max_abstract = 300 if len(articles) <= 5 else 200 if len(articles) <= 10 else 150
         abstract = article.get("abstract", "")[:max_abstract]
         facts = article.get("facts")
 
@@ -97,7 +97,20 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
             raise ValueError(f"JSON-массив не найден в ответе: {text[:200]}")
         json_str = "[" + ",".join(objects) + "]"
 
-    data = json.loads(json_str)
+    try:
+        data = json.loads(json_str)
+    except json.JSONDecodeError:
+        # Пробуем извлечь объекты по одному
+        objects = re.findall(r'\{[^{}]+\}', json_str, re.DOTALL)
+        data = []
+        for obj in objects:
+            try:
+                data.append(json.loads(obj))
+            except json.JSONDecodeError:
+                continue
+        if not data:
+            raise ValueError(f"Не удалось распарсить ни одного объекта из ответа")
+
     if not isinstance(data, list):
         raise ValueError(f"Ожидался список тем, получено: {type(data)}")
 
@@ -105,8 +118,6 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
 
     # Фильтруем темы без источников
     topics = [t for t in topics if t.sources]
-    # Фильтруем темы без источников И без датасетов — они невалидны
-    topics = [t for t in topics if t.sources and t.datasets]
 
     # Убираем дубликаты по заголовку (case-insensitive, первые 60 символов)
     seen_titles: set[str] = set()
@@ -116,7 +127,7 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
         if title_key not in seen_titles:
             seen_titles.add(title_key)
             unique_topics.append(t)
-    
+
     # Дедупликация источников в каждой теме
     for t in unique_topics:
         t.sources = list(dict.fromkeys(t.sources))
@@ -124,13 +135,19 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
     # Фильтруем темы с менее чем 2 источниками
     filtered = [t for t in unique_topics if len(t.sources) >= 2]
 
+    logger.debug(
+        f"Generator _parse_topics: распарсено={len(topics)}, "
+        f"уникальных={len(unique_topics)}, "
+        f"с 2+ источниками={len(filtered)}"
+    )
+
     # Если все отфильтровались — вернуть как есть (лучше 1 тема чем ничего)
     return filtered if filtered else unique_topics
 
 
-
-# Основная функция для генерации тем ВКР. Принимает список статей с фактами, параметры уровня и срока, желаемое количество тем. 
-# Формирует контекст и промпт, отправляет запрос в LLM, парсит и валидирует результат. Делает несколько попыток при невалидном ответе.
+# Основная функция для генерации тем ВКР. Принимает список статей с фактами, параметры уровня и срока, желаемое количество тем.
+# Формирует контекст и промпт, отправляет запрос в LLM, парсит и валидирует результат.
+# Накапливает темы через несколько попыток пока не наберётся нужное количество.
 
 async def generate_topics(
     articles: list[dict],
@@ -156,62 +173,82 @@ async def generate_topics(
 
     context = _build_context(articles)
     template = _load_prompt()
-    prompt = template.format(
-        num_topics=num_topics,
-        level=level,
-        duration=duration,
-        context=context,
-        locale=locale,
-    )
 
     language_name = "Russian" if locale == "ru" else "English"
 
     system_message = (
+        f"CRITICAL: Respond ONLY in {language_name}. "
+        f"Every word of title, rationale, approach must be in {language_name}. "
         f"You are a strict JSON generator. "
-        f"All natural-language values in the JSON response MUST be written in {language_name}. "
-        f"Do not use any other language. "
         f"Keep only technical names, dataset names, model names and URLs unchanged."
     )
 
-    prompt = (
-        f"FINAL LANGUAGE REQUIREMENT: Write title, rationale, approach and dataset descriptions "
-        f"strictly in {language_name}. Do not copy English wording from abstracts unless it is a technical term.\n\n"
-        + prompt
-    )
+    # Накапливаем темы через несколько попыток
+    accumulated: list[GeneratedTopic] = []
+    seen_titles: set[str] = set()
 
     for attempt in range(1, _MAX_RETRIES + 1):
+        # На каждой попытке просим столько тем сколько ещё не хватает (+ 2 про запас)
+        remaining = num_topics - len(accumulated)
+        effective_num = remaining + 2
+
+        prompt = template.format(
+            num_topics=effective_num,
+            level=level,
+            duration=duration,
+            context=context,
+            locale=locale,
+        )
+
+        prompt = (
+            f"FINAL LANGUAGE REQUIREMENT: Write title, rationale, approach and dataset descriptions "
+            f"strictly in {language_name}. Do not copy English wording from abstracts unless it is a technical term.\n\n"
+            + prompt
+        )
+
         try:
             response = ollama.chat(
                 model=settings.ollama_model,
                 messages=[
                     {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt},
-                    ],
+                    {"role": "user",   "content": prompt},
+                ],
                 options={
                     "temperature": 0.5,
-                    "num_predict": 6144,  
-                    },
+                    "num_predict": 6144,
+                },
                 think=False,
             )
             response_text = response["message"]["content"]
-            topics = _parse_topics(response_text)
+            new_topics = _parse_topics(response_text)
 
-            topics = _parse_topics(response_text)
-            if not topics:
-                raise ValueError(
-                    "Все темы невалидны (нет источников\датасетов или все дубликаты) — повторяем"
-                )
+            # Добавляем только новые уникальные темы
+            for t in new_topics:
+                key = t.title.strip().lower()[:60]
+                if key not in seen_titles:
+                    seen_titles.add(key)
+                    accumulated.append(t)
 
             logger.info(
-                f"Generator: сгенерировано {len(topics)} тем "
-                f"(попытка {attempt})"
+                f"Generator: накоплено {len(accumulated)}/{num_topics} тем "
+                f"(попытка {attempt}, новых в этой попытке: {len(new_topics)})"
             )
-            return [t.model_dump() for t in topics]
+
+            # Достаточно тем — выходим
+            if len(accumulated) >= num_topics:
+                break
 
         except (ValueError, json.JSONDecodeError, Exception) as e:
             logger.warning(f"Generator: попытка {attempt}/{_MAX_RETRIES} failed: {e}")
-            if attempt == _MAX_RETRIES:
-                logger.error("Generator: все попытки исчерпаны")
+            if attempt == _MAX_RETRIES and not accumulated:
+                logger.error("Generator: все попытки исчерпаны, тем нет")
                 return []
 
-    return []
+    result = accumulated[:num_topics]
+
+    if not result:
+        logger.error("Generator: не удалось сгенерировать ни одной темы")
+        return []
+
+    logger.info(f"Generator: итого сгенерировано {len(result)} тем")
+    return [t.model_dump() for t in result]

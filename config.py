@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     # Ollama
     ollama_host: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen3.5:2b"
+    ollama_embedding_model: str = "qwen3-embedding:0.6b"
 
     # FAISS
     faiss_index_path: Path = Path("data/faiss_store/index.faiss")
