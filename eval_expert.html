@@ -3,127 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-MathJax = {
-  tex: {
-    inlineMath: [['$', '$']],
-    displayMath: [['$$', '$$']],
-  },
-  startup: {
-    typeset: false 
-  }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script><title>TopicAdvisor — Экспертная оценка</title>
+<title>TopicAdvisor — Экспертная оценка</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap');
 
   :root {
-    --bg: #faf8f4;
-    --bg2: #f2ede4;
-    --border: #d4c9b5;
-    --text: #1a1714;
-    --text2: #5c5448;
-    --text3: #9c8f7e;
-    --accent: #8b5e3c;
-    --accent2: #c4924a;
-    --green: #3d7a5c;
-    --red: #b5443a;
-    --gold: #c4924a;
+    --bg: #faf8f4; --bg2: #f2ede4; --border: #d4c9b5;
+    --text: #1a1714; --text2: #5c5448; --text3: #9c8f7e;
+    --accent: #8b5e3c; --accent2: #c4924a;
+    --green: #3d7a5c; --red: #b5443a; --gold: #c4924a;
     --shadow: 0 2px 16px rgba(26,23,20,0.08);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Serif 4', Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.65; }
 
-  body {
-    font-family: 'Source Serif 4', Georgia, serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.65;
-  }
-
-  /* ── Header ── */
-  header {
-    background: var(--text);
-    color: var(--bg);
-    padding: 28px 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 24px rgba(0,0,0,0.18);
-  }
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    color: var(--bg);
-  }
+  header { background: var(--text); color: var(--bg); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 24px rgba(0,0,0,0.18); }
+  .header-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; letter-spacing: 0.3px; color: var(--bg); }
   .header-sub { font-size: 13px; color: rgba(250,248,244,0.5); margin-top: 2px; }
   .header-right { display: flex; gap: 16px; align-items: center; }
-  .progress-pill {
-    background: rgba(250,248,244,0.1);
-    border: 1px solid rgba(250,248,244,0.2);
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 12px;
-    color: rgba(250,248,244,0.7);
-  }
+  .progress-pill { background: rgba(250,248,244,0.1); border: 1px solid rgba(250,248,244,0.2); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: rgba(250,248,244,0.7); }
   .progress-pill span { color: var(--accent2); font-weight: 600; }
 
-  /* ── Layout ── */
   .app { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
 
-  /* ── Sections ── */
-  .section {
-    margin-bottom: 48px;
-    border-radius: 12px;
-    background: white;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .section-header {
-    padding: 20px 28px 18px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .section-num {
-    width: 32px; height: 32px;
-    background: var(--text);
-    color: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 14px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 17px; font-weight: 600;
-    color: var(--text);
-  }
+  .section { margin-bottom: 48px; border-radius: 12px; background: white; box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
+  .section-header { padding: 20px 28px 18px; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; align-items: center; gap: 14px; }
+  .section-num { width: 32px; height: 32px; background: var(--text); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--text); }
   .section-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
   .section-body { padding: 24px 28px; }
 
-  /* ── Upload zone ── */
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--bg);
-  }
+  .upload-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg); }
   .upload-zone:hover { border-color: var(--accent); background: #fdf8f2; }
   .upload-zone.active { border-color: var(--green); background: #f0f7f4; }
   .upload-icon { font-size: 36px; margin-bottom: 12px; }
@@ -131,64 +41,19 @@ MathJax = {
   .upload-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
   #file-input { display: none; }
 
-  /* ── Tabs ── */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
-  .tab {
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text3);
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tab { padding: 10px 16px; cursor: pointer; font-size: 12px; color: var(--text3); border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
   .tab:hover { color: var(--accent); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-sep { width: 1px; background: var(--border); margin: 8px 8px; }
 
-  /* ── Query card ── */
-  .query-card {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-  .query-header {
-    padding: 12px 16px;
-    background: var(--bg2);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-  }
+  .query-card { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .query-header { padding: 12px 16px; background: var(--bg2); display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
   .query-header:hover { background: #ece5d8; }
-  .query-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 13px;
-    color: var(--text3);
-    min-width: 28px;
-  }
-  .query-text {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text);
-    line-height: 1.4;
-  }
-  .query-badge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: var(--accent);
-    color: white;
-  }
-  .query-badge.cs { background: #3d5f8a; }
-  .query-badge.math { background: #3d7a5c; }
-  .query-badge.physics { background: #7a3d6e; }
-  .query-status {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 10px;
-  }
+  .query-num { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--text3); min-width: 28px; }
+  .query-text { flex: 1; font-size: 14px; color: var(--text); line-height: 1.4; }
+  .query-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #3d5f8a; color: white; }
+  .query-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
   .status-done { background: #e8f5ee; color: var(--green); }
   .status-partial { background: #fef6e4; color: var(--gold); }
   .status-pending { background: var(--bg); color: var(--text3); border: 1px solid var(--border); }
@@ -197,25 +62,10 @@ MathJax = {
   .query-body { padding: 0 16px 16px; display: none; }
   .query-body.open { display: block; }
 
-  /* ── Table ── */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead tr { background: var(--bg2); }
-  th {
-    padding: 10px 12px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text2);
-    font-family: 'Source Serif 4', serif;
-    font-size: 12px;
-    border-bottom: 1px solid var(--border);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #f0ebe0;
-    vertical-align: top;
-  }
+  th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f0ebe0; vertical-align: top; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--bg); }
   .article-title { font-weight: 500; color: var(--text); margin-bottom: 3px; }
@@ -223,271 +73,88 @@ MathJax = {
   .article-url a { color: var(--accent); text-decoration: none; }
   .article-url a:hover { text-decoration: underline; }
 
-  /* ── Radio buttons ── */
-  .rel-group { display: flex; gap: 6px; }
-  .rel-btn {
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.15s;
-    background: white;
-    color: var(--text2);
-  }
+  .rel-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rel-btn { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; font-size: 12px; transition: all 0.15s; background: white; color: var(--text2); }
   .rel-btn:hover { border-color: var(--accent); color: var(--accent); }
   .rel-btn.sel-yes { background: #e8f5ee; border-color: var(--green); color: var(--green); font-weight: 600; }
   .rel-btn.sel-no { background: #fdecea; border-color: var(--red); color: var(--red); font-weight: 600; }
   .rel-btn.sel-partial { background: #fef6e4; border-color: var(--gold); color: var(--gold); font-weight: 600; }
 
-  /* ── Star rating ── */
   .stars { display: flex; gap: 4px; }
-  .star {
-    cursor: pointer;
-    font-size: 20px;
-    color: #d4c9b5;
-    transition: color 0.1s;
-    line-height: 1;
-  }
+  .star { cursor: pointer; font-size: 20px; color: #d4c9b5; transition: color 0.1s; line-height: 1; }
   .star.active { color: var(--gold); }
   .star:hover ~ .star { color: #d4c9b5 !important; }
   .stars:hover .star { color: var(--gold); }
   .stars:hover .star:hover ~ .star { color: #d4c9b5; }
 
-  /* ── Facts block ── */
   .facts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .fact-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-  }
-  .fact-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-  .fact-value {
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.5;
-  }
-  .fact-value.list span {
-    display: inline-block;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 7px;
-    font-size: 11px;
-    margin: 2px;
-  }
-  .fact-accuracy {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
+  .fact-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .fact-label { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .fact-value { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .fact-accuracy { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
   .fact-accuracy label { font-size: 12px; color: var(--text2); }
   .acc-btns { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-  .acc-btn {
-    padding: 3px 10px;
-    border-radius: 5px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    font-size: 11px;
-    transition: all 0.15s;
-    background: white;
-    color: var(--text2);
-  }
+  .acc-btn { padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border); cursor: pointer; font-size: 11px; transition: all 0.15s; background: white; color: var(--text2); }
   .acc-btn.sel-correct { background: #e8f5ee; border-color: var(--green); color: var(--green); font-weight: 600; }
   .acc-btn.sel-partial { background: #fef6e4; border-color: var(--gold); color: var(--gold); font-weight: 600; }
   .acc-btn.sel-wrong { background: #fdecea; border-color: var(--red); color: var(--red); font-weight: 600; }
 
-  /* ── Topics block ── */
-  .topic-card {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 14px;
-    overflow: hidden;
-  }
-  .topic-header {
-    padding: 12px 14px;
-    background: var(--bg2);
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text);
-  }
-  .topic-num {
-    font-family: 'Playfair Display', serif;
-    color: var(--text3);
-    font-size: 12px;
-    margin-right: 8px;
-  }
+  .topic-card { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+  .topic-header { padding: 12px 14px; background: var(--bg2); font-weight: 600; font-size: 14px; color: var(--text); }
+  .topic-num { font-family: 'Playfair Display', serif; color: var(--text3); font-size: 12px; margin-right: 8px; }
   .topic-body { padding: 14px; }
   .topic-section { margin-bottom: 10px; }
-  .topic-section-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
+  .topic-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 4px; }
   .topic-section-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .topic-eval {
-    padding: 12px 14px;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
-  }
+  .topic-eval { padding: 12px 14px; border-top: 1px solid var(--border); background: var(--bg); }
 
-  /* ── Expert rating table ── */
   .expert-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
   .expert-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
   .expert-table td:first-child { font-weight: 500; width: 200px; }
   .expert-table tr:last-child td { border: none; }
 
-  /* ── Metrics summary ── */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
-    margin-bottom: 24px;
-  }
-  .metric-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.05);
-  }
-  .metric-name {
-    font-size: 11px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-  .metric-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--accent);
-    line-height: 1;
-  }
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .metric-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); }
+  .metric-name { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .metric-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; }
   .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
-  .metric-bar {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-top: 8px;
-    overflow: hidden;
-  }
+  .metric-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
   .metric-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s; }
 
-  /* ── Buttons ── */
-  .btn {
-    padding: 10px 22px;
-    border-radius: 7px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-family: 'Source Serif 4', serif;
-    font-weight: 600;
-    transition: all 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .btn { padding: 10px 22px; border-radius: 7px; border: none; cursor: pointer; font-size: 14px; font-family: 'Source Serif 4', serif; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; }
   .btn-primary { background: var(--text); color: white; }
   .btn-primary:hover { background: var(--accent); }
   .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
   .btn-success { background: var(--green); color: white; }
   .btn-success:hover { background: #2d6b4e; }
-
   .btn-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
 
-  /* ── Notices ── */
-  .notice {
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
+  .notice { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
   .notice-info { background: #e8f2fa; border: 1px solid #b8d4eb; color: #2a5a80; }
   .notice-warn { background: #fef6e4; border: 1px solid #e8d4a0; color: #7a5c20; }
   .notice-success { background: #e8f5ee; border: 1px solid #a8d4b8; color: #2a6040; }
 
-  /* ── Final summary ── */
   .summary-section { margin-bottom: 32px; }
-  .summary-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-  }
+  .summary-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
   .breakdown-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .breakdown-table th, .breakdown-table td {
-    padding: 9px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
+  .breakdown-table th, .breakdown-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
   .breakdown-table th { background: var(--bg2); font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; }
   .breakdown-table tr:last-child td { border: none; }
   .val-good { color: var(--green); font-weight: 600; }
   .val-mid { color: var(--gold); font-weight: 600; }
   .val-bad { color: var(--red); font-weight: 600; }
 
-  /* ── Loading ── */
-  .loading {
-    display: flex; align-items: center; justify-content: center;
-    padding: 80px;
-    flex-direction: column;
-    gap: 16px;
-    color: var(--text3);
-  }
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .loading { display: flex; align-items: center; justify-content: center; padding: 80px; flex-direction: column; gap: 16px; color: var(--text3); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Misc ── */
-  .text-center { text-align: center; }
   .mt-16 { margin-top: 16px; }
-  .mt-8 { margin-top: 8px; }
   .divider { height: 1px; background: var(--border); margin: 20px 0; }
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    background: var(--bg2);
-    color: var(--text3);
-    border: 1px solid var(--border);
-    margin-right: 4px;
-  }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--bg2); color: var(--text3); border: 1px solid var(--border); margin-right: 4px; }
   .hide { display: none !important; }
   .subquery-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .subquery-tag {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 12px;
-    color: var(--text2);
-  }
+  .subquery-tag { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; font-size: 12px; color: var(--text2); }
 
   @media (max-width: 768px) {
     header { padding: 16px 20px; flex-wrap: wrap; gap: 10px; }
@@ -502,19 +169,17 @@ MathJax = {
 <header>
   <div>
     <div class="header-title">TopicAdvisor — Экспертная оценка</div>
-    <div class="header-sub">Оценка качества RAG-пайплайна</div>
+    <div class="header-sub">Оценка качества RAG-пайплайна · 8 доменов CS · top_k=[5,8,11]</div>
   </div>
   <div class="header-right">
     <div class="progress-pill" id="progress-indicator">Загрузите файл результатов</div>
-    <button class="btn btn-secondary" onclick="exportResults()" id="export-btn" style="display:none">
-      ⬇ Экспорт оценок
-    </button>
+    <button class="btn btn-secondary" onclick="exportResults()" id="export-btn" style="display:none">⬇ Экспорт оценок</button>
   </div>
 </header>
 
-<div class="app" id="app">
+<div class="app">
 
-  <!-- Шаг 0: Загрузка файла -->
+  <!-- 0: Загрузка -->
   <div class="section" id="section-upload">
     <div class="section-header">
       <div class="section-num">0</div>
@@ -524,24 +189,20 @@ MathJax = {
       </div>
     </div>
     <div class="section-body">
-      <div class="notice notice-info">
-        ℹ Файл обрабатывается полностью в браузере. Никакие данные не отправляются на сервер.
-        Ваши оценки автоматически сохраняются в localStorage браузера при каждом клике.
-      </div>
+      <div class="notice notice-info">ℹ Файл обрабатывается полностью в браузере. Оценки автоматически сохраняются в localStorage.</div>
       <div class="upload-zone" onclick="document.getElementById('file-input').click()" id="drop-zone">
         <div class="upload-icon">📂</div>
         <div class="upload-text">Нажмите или перетащите файл eval_results.json</div>
-        <div class="upload-hint">JSON-файл с результатами прогона пайплайна по 27 запросам</div>
+        <div class="upload-hint">JSON-файл с результатами прогона (8 доменов × 3 top_k = 24 прогона)</div>
       </div>
       <input type="file" id="file-input" accept=".json" onchange="loadFile(this)">
     </div>
   </div>
 
-  <!-- Основной контент (скрыт до загрузки) -->
   <div id="main-content" class="hide">
 
-    <!-- Шаг 1: Машинные метрики (из файла) -->
-    <div class="section" id="section-auto">
+    <!-- 1: Машинные метрики -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">1</div>
         <div>
@@ -554,114 +215,84 @@ MathJax = {
       </div>
     </div>
 
-    <!-- Шаг 2: Precision@K (Retriever) -->
-    <div class="section" id="section-precision">
+    <!-- 2: Precision@K -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">2</div>
         <div>
           <div class="section-title">Precision@K — Retriever</div>
-          <div class="section-desc">
-            Отметьте каждую статью как релевантную (✓) или нерелевантную (✗) запросу.
-            После оценки всех запросов метрики Precision@K и NDCG@K вычислятся автоматически.
-          </div>
+          <div class="section-desc">Отметьте каждую статью как релевантную или нерелевантную запросу. Precision@K и NDCG@K вычислятся автоматически.</div>
         </div>
       </div>
       <div class="section-body">
-        <div class="notice notice-warn">
-          💡 <b>Как оценивать:</b> статья релевантна, если её тема соответствует исходному запросу
-          и могла бы быть использована как источник для темы ВКР по данной области.
-        </div>
-        <div class="tabs" id="precision-tabs"></div>
+        <div class="notice notice-warn">💡 <b>Как оценивать:</b> статья релевантна, если её тема соответствует запросу и могла бы быть источником для темы ВКР.</div>
+        <div class="tabs" id="precision-domain-tabs"></div>
+        <div class="tabs" id="precision-k-tabs" style="margin-top:4px"></div>
         <div style="margin-top:16px" id="precision-content"></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="computeRetrieverMetrics()">
-            ✓ Вычислить Precision@K, NDCG@K
-          </button>
-          <button class="btn btn-secondary" onclick="markAllRelevant()" id="mark-all-btn">
-            Отметить все релевантными
-          </button>
+          <button class="btn btn-primary" onclick="computeRetrieverMetrics()">✓ Вычислить Precision@K, NDCG@K</button>
+          <button class="btn btn-secondary" onclick="markAllRelevant()">Отметить все релевантными</button>
         </div>
         <div id="retriever-results" class="hide mt-16"></div>
       </div>
     </div>
 
-    <!-- Шаг 3: NDCG@K (Reranker) -->
-    <div class="section" id="section-ndcg">
+    <!-- 3: NDCG -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">3</div>
         <div>
           <div class="section-title">NDCG@K и delta-Precision@K — Reranker</div>
-          <div class="section-desc">
-            Вычисляется автоматически на основе оценок из шага 2. Показывает качество переранжирования.
-          </div>
+          <div class="section-desc">Вычисляется автоматически на основе оценок из шага 2.</div>
         </div>
       </div>
       <div class="section-body" id="ndcg-body">
-        <div class="notice notice-info">
-          ℹ Для вычисления NDCG нажмите кнопку «Вычислить» в шаге 2. Метрика появится здесь автоматически.
-        </div>
+        <div class="notice notice-info">ℹ Нажмите «Вычислить» в шаге 2 — метрика появится здесь автоматически.</div>
       </div>
     </div>
 
-    <!-- Шаг 4: Field Accuracy (Extractor) -->
-    <div class="section" id="section-extractor">
+    <!-- 4: Field Accuracy -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">4</div>
         <div>
           <div class="section-title">Field Accuracy — Extractor</div>
-          <div class="section-desc">
-            Для каждого поля (problem, gap, methods, datasets, metrics) оцените корректность
-            извлечения фактов: ✓ Верно / ~ Частично / ✗ Неверно. Сравните с оригинальным абстрактом.
-          </div>
+          <div class="section-desc">Оцените корректность извлечения фактов: ✓ Верно / ~ Частично / ✗ Неверно. Только статьи с найденными фактами (has_facts=true).</div>
         </div>
       </div>
       <div class="section-body">
-        <div class="notice notice-warn">
-          💡 <b>Как оценивать:</b> прочитайте абстракт статьи и сравните с тем, что извлекла система.
-          «Верно» — факт корректно отражает содержание; «Частично» — есть неточности;
-          «Неверно» — факт ошибочен или выдуман.
-        </div>
+        <div class="notice notice-warn">💡 <b>Как оценивать:</b> прочитайте абстракт и сравните с извлечёнными полями. Статьи без фактов исключены из оценки автоматически.</div>
         <div class="tabs" id="extractor-tabs"></div>
         <div style="margin-top:16px" id="extractor-content"></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="computeFieldAccuracy()">
-            ✓ Вычислить Field Accuracy
-          </button>
+          <button class="btn btn-primary" onclick="computeFieldAccuracy()">✓ Вычислить Field Accuracy</button>
         </div>
         <div id="extractor-results" class="hide mt-16"></div>
       </div>
     </div>
 
-    <!-- Шаг 5: Relevance@K + Экспертная оценка тем -->
-    <div class="section" id="section-topics">
+    <!-- 5: Relevance@K -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">5</div>
         <div>
           <div class="section-title">Relevance@K + Экспертная оценка тем — Generator</div>
-          <div class="section-desc">
-            Оцените релевантность каждой темы запросу и выставьте баллы по 5 критериям.
-          </div>
+          <div class="section-desc">Оцените релевантность каждой темы и выставьте баллы по 5 критериям. Используются прогоны с top_k=8.</div>
         </div>
       </div>
       <div class="section-body">
-        <div class="notice notice-info">
-          📋 <b>Критерии оценки (1–5):</b>
-          Научная новизна · Корректность формулировки · Обоснованность/актуальность ·
-          Практическая реализуемость · Качество источников
-        </div>
+        <div class="notice notice-info">📋 <b>Критерии (1–5):</b> Научная новизна · Корректность формулировки · Обоснованность/актуальность · Практическая реализуемость · Качество источников</div>
         <div class="tabs" id="topics-tabs"></div>
         <div style="margin-top:16px" id="topics-content"></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="computeTopicMetrics()">
-            ✓ Вычислить Relevance@K и оценки
-          </button>
+          <button class="btn btn-primary" onclick="computeTopicMetrics()">✓ Вычислить Relevance@K и оценки</button>
         </div>
         <div id="topics-results" class="hide mt-16"></div>
       </div>
     </div>
 
-    <!-- Шаг 6: Итоговые метрики -->
-    <div class="section" id="section-final">
+    <!-- 6: Итог -->
+    <div class="section">
       <div class="section-header">
         <div class="section-num">6</div>
         <div>
@@ -670,96 +301,101 @@ MathJax = {
         </div>
       </div>
       <div class="section-body" id="final-body">
-        <div class="notice notice-info">
-          ℹ Итоговый отчёт сформируется после завершения всех шагов экспертной оценки.
-        </div>
+        <div class="notice notice-info">ℹ Итоговый отчёт сформируется после завершения всех шагов.</div>
         <div class="btn-row">
-          <button class="btn btn-success" onclick="generateFinalReport()">
-            🏁 Сформировать итоговый отчёт
-          </button>
+          <button class="btn btn-success" onclick="generateFinalReport()">🏁 Сформировать итоговый отчёт</button>
         </div>
       </div>
     </div>
 
-  </div><!-- /main-content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <script>
-// ─── Состояние приложения ─────────────────────────────────────────────────────
-let DATA = null;        // eval_results.json
-let RATINGS = {};       // оценки эксперта { queryIdx_topk: {...} }
-const STORAGE_KEY = 'topicadvisor_eval_v1';
+// Конфигурация под eval_runner 
+// Домены
+const DOMAINS = {
+  cs_ai: 'cs.AI — Autonomous Intelligence',
+  cs_cv: 'cs.CV — Computer Vision',
+  cs_cl: 'cs.CL — Language Models',
+  cs_cr: 'cs.CR — Code Security',
+  cs_ir: 'cs.IR — Information Retrieval',
+  cs_sd: 'cs.SD — Speech Synthesis',
+  cs_ro: 'cs.RO — Robotics',
+  cs_lg: 'cs.LG — Machine Learning',
+};
+const DOMAIN_KEYS = Object.keys(DOMAINS);
+
+// top_k 
+const TOP_K_VALUES = [5, 8, 11];
+
+// Extractor и Topics оцениваются по top_k=8 (средний режим)
+const EVAL_TOP_K = 8;
+
+const openCards = new Set();
+
 const CRITERIA = ['novelty','wording','relevance','feasibility','sources'];
 const CRITERIA_LABELS = ['Научная новизна','Корректность формулировки','Обоснованность/актуальность','Практическая реализуемость','Качество источников'];
-const DOMAINS = {cs:'Computer Science',math:'Mathematics',physics:'Physics'};
-const DOMAIN_COLORS = {cs:'cs',math:'math',physics:'physics'};
 
-// ─── Загрузка и сохранение ───────────────────────────────────────────────────
+const STORAGE_KEY = 'topicadvisor_eval_v2';
+
+// Состояние 
+let DATA = null;
+let RATINGS = {};
+
+// Загрузка файла и инициализация приложения
 function loadFile(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const raw = JSON.parse(e.target.result);
-      DATA = raw;
-      // Загружаем сохранённые оценки
+      DATA = JSON.parse(e.target.result);
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try { RATINGS = JSON.parse(saved); } catch {}
-      }
+      if (saved) { try { RATINGS = JSON.parse(saved); } catch {} }
       document.getElementById('drop-zone').classList.add('active');
       document.getElementById('drop-zone').innerHTML =
-        `<div class="upload-icon">✅</div><div class="upload-text">${file.name} загружен</div>
-         <div class="upload-hint">${(DATA.results||[]).length} запросов · нажмите снова для замены</div>`;
+        `<div class="upload-icon">✅</div>
+         <div class="upload-text">${file.name} загружен</div>
+         <div class="upload-hint">${(DATA.results||[]).length} прогонов · нажмите снова для замены</div>`;
       initApp();
-    } catch(ex) {
-      alert('Ошибка чтения файла: ' + ex.message);
-    }
+    } catch(ex) { alert('Ошибка чтения файла: ' + ex.message); }
   };
   reader.readAsText(file);
 }
 
 function saveRatings() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(RATINGS));
-  updateProgressIndicator();
+  updateProgress();
 }
 
-function rate(key, value) {
-  RATINGS[key] = value;
-  saveRatings();
-}
-
-function updateProgressIndicator() {
+function updateProgress() {
   if (!DATA) return;
   const total = (DATA.results||[]).length;
-  // Считаем сколько запросов полностью оценены (хотя бы precision)
-  const precDone = Object.keys(RATINGS).filter(k => k.startsWith('prec_')).length;
-  document.getElementById('progress-indicator').innerHTML =
-    `Оценено: <span>${precDone}</span> / ${total} артикулов`;
+  const done = Object.keys(RATINGS).filter(k => k.startsWith('prec_')).length;
+  document.getElementById('progress-indicator').innerHTML = `Оценено: <span>${done}</span> / ${total} статей`;
   document.getElementById('export-btn').style.display = 'inline-flex';
 }
 
-// ─── Инициализация ────────────────────────────────────────────────────────────
 function initApp() {
   document.getElementById('main-content').classList.remove('hide');
   renderAutoMetrics();
   renderPrecisionSection();
   renderExtractorSection();
   renderTopicsSection();
-  updateProgressIndicator();
+  updateProgress();
 }
 
-// ─── 1. Машинные метрики ─────────────────────────────────────────────────────
+// 1. Машинные метрики 
 function renderAutoMetrics() {
   const s = DATA.summary || {};
   const ttr = s.time_to_result || {};
   const jpr = s.json_parse_rates || {};
-  const cr = s.coverage_rate || {};
-  const tc = s.topic_coherence || {};
+  const tc  = s.topic_coherence || {};
+  const ec  = s.extractor_coverage || {};
 
   const pct = v => v != null ? (v*100).toFixed(1)+'%' : '—';
-  const colorClass = v => v >= 0.8 ? 'val-good' : v >= 0.5 ? 'val-mid' : 'val-bad';
+  const cls = v => v >= 0.8 ? 'val-good' : v >= 0.5 ? 'val-mid' : 'val-bad';
   const sec = v => v != null ? v+'с' : '—';
 
   document.getElementById('auto-metrics-body').innerHTML = `
@@ -768,50 +404,36 @@ function renderAutoMetrics() {
         <div class="metric-name">Time-to-Result (медиана)</div>
         <div class="metric-value">${sec(ttr.median)}</div>
         <div class="metric-sub">Среднее: ${sec(ttr.mean)} · Мин: ${sec(ttr.min)} · Макс: ${sec(ttr.max)}</div>
-        <div class="metric-bar"><div class="metric-bar-fill" style="width:${Math.min(100,(ttr.median||0)/6*100)}%"></div></div>
+        <div class="metric-bar"><div class="metric-bar-fill" style="width:${Math.min(100,(ttr.median||0)/180*100)}%"></div></div>
       </div>
       <div class="metric-card">
         <div class="metric-name">Planner JSON Parse Rate</div>
-        <div class="metric-value ${colorClass(jpr.planner||0)}">${pct(jpr.planner)}</div>
-        <div class="metric-sub">Доля запросов с валидным JSON с 1-й попытки</div>
+        <div class="metric-value ${cls(jpr.planner||0)}">${pct(jpr.planner)}</div>
+        <div class="metric-sub">Доля запросов с валидным списком подзапросов</div>
         <div class="metric-bar"><div class="metric-bar-fill" style="width:${((jpr.planner||0)*100).toFixed(0)}%"></div></div>
       </div>
       <div class="metric-card">
         <div class="metric-name">Extractor JSON Parse Rate</div>
-        <div class="metric-value ${colorClass(jpr.extractor||0)}">${pct(jpr.extractor)}</div>
-        <div class="metric-sub">Доля абстрактов с корректным JSON фактов</div>
+        <div class="metric-value ${cls(jpr.extractor||0)}">${pct(jpr.extractor)}</div>
+        <div class="metric-sub">Статей с фактами в среднем: ${ec.mean_articles_with_facts||'—'} / ${ec.mean_articles_total||'—'}</div>
         <div class="metric-bar"><div class="metric-bar-fill" style="width:${((jpr.extractor||0)*100).toFixed(0)}%"></div></div>
       </div>
       <div class="metric-card">
         <div class="metric-name">Generator JSON Parse Rate</div>
-        <div class="metric-value ${colorClass(jpr.generator||0)}">${pct(jpr.generator)}</div>
-        <div class="metric-sub">Доля запросов с корректным JSON тем</div>
+        <div class="metric-value ${cls(jpr.generator||0)}">${pct(jpr.generator)}</div>
+        <div class="metric-sub">Доля прогонов с итоговыми темами (с накоплением)</div>
         <div class="metric-bar"><div class="metric-bar-fill" style="width:${((jpr.generator||0)*100).toFixed(0)}%"></div></div>
       </div>
       <div class="metric-card">
-        <div class="metric-name">Coverage Rate (CS)</div>
-        <div class="metric-value ${colorClass(cr.cs||0)}">${pct(cr.cs)}</div>
-        <div class="metric-sub">Покрытие тематического пространства CS</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-name">Coverage Rate (Math)</div>
-        <div class="metric-value ${colorClass(cr.math||0)}">${pct(cr.math)}</div>
-        <div class="metric-sub">Покрытие тематического пространства математики</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-name">Coverage Rate (Physics)</div>
-        <div class="metric-value ${colorClass(cr.physics||0)}">${pct(cr.physics)}</div>
-        <div class="metric-sub">Покрытие тематического пространства физики</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-name">Topic Coherence</div>
-        <div class="metric-value ${colorClass(tc.overall||0)}">${(tc.overall||0).toFixed(3)}</div>
+        <div class="metric-name">Topic Coherence (overall)</div>
+        <div class="metric-value ${cls(tc.overall||0)}">${(tc.overall||0).toFixed(3)}</div>
         <div class="metric-sub">Косинусное сходство темы с источниками</div>
         <div class="metric-bar"><div class="metric-bar-fill" style="width:${((tc.overall||0)*100).toFixed(0)}%"></div></div>
       </div>
-    </div>
+      </div>
+
     <div class="summary-title" style="font-size:15px;margin-top:20px">Time-to-Result по доменам и Top-K</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
       <table class="breakdown-table">
         <thead><tr><th>Домен</th><th>Среднее время</th></tr></thead>
         <tbody>
@@ -825,66 +447,68 @@ function renderAutoMetrics() {
         </tbody>
       </table>
     </div>
+
+    <div class="summary-title" style="font-size:15px;margin-top:20px">Topic Coherence по доменам</div>
+    <div class="metrics-grid" style="margin-top:12px">
+      ${Object.entries(tc.by_domain||{}).map(([d,v])=>`<div class="metric-card">
+        <div class="metric-name">${DOMAINS[d]||d}</div>
+        <div class="metric-value" style="font-size:22px">${(v||0).toFixed(3)}</div>
+      </div>`).join('')}
+    </div>
   `;
 }
 
-// ─── 2. Precision@K ───────────────────────────────────────────────────────────
-let currentPrecTab = 'cs';
-let currentPrecK = 5;
+// 2. Precision@K 
+let precDomain = DOMAIN_KEYS[0];
+let precK = TOP_K_VALUES[0];
 
 function renderPrecisionSection() {
-  // Табы по доменам
-  const tabsEl = document.getElementById('precision-tabs');
-  tabsEl.innerHTML = ['cs','math','physics'].map(d =>
-    `<div class="tab ${d===currentPrecTab?'active':''}" onclick="switchPrecTab('${d}')">${DOMAINS[d]}</div>`
-  ).join('') +
-  ['5','10','15'].map(k =>
-    `<div class="tab ${Number(k)===currentPrecK?'active':''}" onclick="switchPrecK(${k})" style="margin-left:${k==='5'?'24px':'0'}">Top-${k}</div>`
-  ).join('');
+  document.getElementById('precision-domain-tabs').innerHTML =
+    DOMAIN_KEYS.map(d =>
+      `<div class="tab ${d===precDomain?'active':''}" onclick="precDomain='${d}';renderPrecisionSection()">${DOMAINS[d]}</div>`
+    ).join('');
+
+  document.getElementById('precision-k-tabs').innerHTML =
+    TOP_K_VALUES.map(k =>
+      `<div class="tab ${k===precK?'active':''}" onclick="precK=${k};renderPrecisionSection()">Top-${k}</div>`
+    ).join('');
+
   renderPrecisionContent();
 }
 
-function switchPrecTab(d) { currentPrecTab = d; renderPrecisionSection(); }
-function switchPrecK(k) { currentPrecK = k; renderPrecisionSection(); }
-
 function renderPrecisionContent() {
-  const results = (DATA.results||[]).filter(r => r.domain === currentPrecTab && r.top_k === currentPrecK);
+  const results = (DATA.results||[]).filter(r => r.domain===precDomain && r.top_k===precK);
+  if (!results.length) {
+    document.getElementById('precision-content').innerHTML = '<div class="notice notice-info">Нет данных для этой комбинации.</div>';
+    return;
+  }
   let html = '';
   results.forEach((r, qi) => {
-    const globalIdx = DATA.results.indexOf(r);
+    const gi = DATA.results.indexOf(r);
     const arts = r.articles || [];
-    const doneCount = arts.filter((_,ai) => RATINGS[`prec_${globalIdx}_${ai}`] !== undefined).length;
-    const statusClass = doneCount === 0 ? 'status-pending' : doneCount === arts.length ? 'status-done' : 'status-partial';
-    const statusLabel = doneCount === 0 ? 'Не оценено' : doneCount === arts.length ? 'Готово' : `${doneCount}/${arts.length}`;
+    const done = arts.filter((_,ai) => RATINGS[`prec_${gi}_${ai}`] !== undefined).length;
+    const sc = done===0?'status-pending':done===arts.length?'status-done':'status-partial';
+    const sl = done===0?'Не оценено':done===arts.length?'Готово':`${done}/${arts.length}`;
 
     html += `<div class="query-card">
-      <div class="query-header" onclick="toggleCard('prec-${globalIdx}')">
+      <div class="query-header" onclick="toggleCard('prec-${gi}')">
         <div class="query-num">${qi+1}.</div>
         <div class="query-text">${r.query}</div>
-        <span class="query-badge ${currentPrecTab}">${currentPrecTab.toUpperCase()}</span>
-        <span class="query-status ${statusClass}">${statusLabel}</span>
-        <span class="chevron" id="chev-prec-${globalIdx}">▼</span>
+        <span class="query-badge">${precDomain.toUpperCase()}</span>
+        <span class="query-status ${sc}">${sl}</span>
+        <span class="chevron" id="chev-prec-${gi}">▼</span>
       </div>
-      <div class="query-body" id="prec-${globalIdx}">
+      <div class="query-body" id="prec-${gi}">
         <div style="margin-top:12px">
-          <div style="font-size:12px;color:var(--text3);margin-bottom:8px">
-            Подзапросы Planner (${(r.subqueries||[]).length}):
-          </div>
-          <div class="subquery-list">
-            ${(r.subqueries||[]).map(sq=>`<span class="subquery-tag">${sq}</span>`).join('')}
-          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Подзапросы Planner (${(r.subqueries||[]).length}):</div>
+          <div class="subquery-list">${(r.subqueries||[]).map(sq=>`<span class="subquery-tag">${sq}</span>`).join('')}</div>
         </div>
         <div style="margin-top:16px">
           <table>
-            <thead><tr>
-              <th style="width:40px">#</th>
-              <th>Статья</th>
-              <th style="width:160px">Релевантность запросу</th>
-            </tr></thead>
+            <thead><tr><th style="width:40px">#</th><th>Статья</th><th style="width:200px">Релевантность</th></tr></thead>
             <tbody>
-              ${arts.map((a,ai) => {
-                const key = `prec_${globalIdx}_${ai}`;
-                const val = RATINGS[key];
+              ${arts.map((a,ai)=>{
+                const key=`prec_${gi}_${ai}`, val=RATINGS[key];
                 return `<tr>
                   <td style="color:var(--text3);font-size:12px">${ai+1}</td>
                   <td>
@@ -896,9 +520,9 @@ function renderPrecisionContent() {
                   </td>
                   <td>
                     <div class="rel-group">
-                      <span class="rel-btn ${val==='yes'?'sel-yes':''}" onclick="setPrec(${globalIdx},${ai},'yes');event.stopPropagation()">✓ Да</span>
-                      <span class="rel-btn ${val==='partial'?'sel-partial':''}" onclick="setPrec(${globalIdx},${ai},'partial');event.stopPropagation()">~ Частично</span>
-                      <span class="rel-btn ${val==='no'?'sel-no':''}" onclick="setPrec(${globalIdx},${ai},'no');event.stopPropagation()">✗ Нет</span>
+                      <span class="rel-btn ${val==='yes'?'sel-yes':''}" onclick="setPrec(${gi},${ai},'yes');event.stopPropagation()">✓ Да</span>
+                      <span class="rel-btn ${val==='partial'?'sel-partial':''}" onclick="setPrec(${gi},${ai},'partial');event.stopPropagation()">~ Частично</span>
+                      <span class="rel-btn ${val==='no'?'sel-no':''}" onclick="setPrec(${gi},${ai},'no');event.stopPropagation()">✗ Нет</span>
                     </div>
                   </td>
                 </tr>`;
@@ -909,184 +533,158 @@ function renderPrecisionContent() {
       </div>
     </div>`;
   });
-  document.getElementById('precision-content').innerHTML = html || '<div class="notice notice-info">Нет данных для этой комбинации.</div>';
+  document.getElementById('precision-content').innerHTML = html;
+  applyOpenCards();
 }
 
-function setPrec(gIdx, artIdx, val) {
-  RATINGS[`prec_${gIdx}_${artIdx}`] = val;
+function setPrec(gi, ai, val) {
+  RATINGS[`prec_${gi}_${ai}`] = val;
   saveRatings();
   renderPrecisionContent();
 }
 
 function toggleCard(id) {
-  const body = document.getElementById(id);
-  const chev = document.getElementById('chev-' + id);
-  if (!body) return;
-  body.classList.toggle('open');
-  if (chev) chev.classList.toggle('open');
+  if (openCards.has(id)) {
+    openCards.delete(id);
+  } else {
+    openCards.add(id);
+  }
+  applyOpenCards();
+}
+
+function applyOpenCards() {
+  openCards.forEach(id => {
+    const body = document.getElementById(id);
+    const chev = document.getElementById('chev-' + id);
+    if (body) body.classList.add('open');
+    if (chev) chev.classList.add('open');
+  });
 }
 
 function markAllRelevant() {
-  const results = (DATA.results||[]).filter(r => r.domain===currentPrecTab && r.top_k===currentPrecK);
-  results.forEach(r => {
+  (DATA.results||[]).filter(r=>r.domain===precDomain&&r.top_k===precK).forEach(r=>{
     const gi = DATA.results.indexOf(r);
-    (r.articles||[]).forEach((_,ai) => { RATINGS[`prec_${gi}_${ai}`] = 'yes'; });
+    (r.articles||[]).forEach((_,ai)=>{ RATINGS[`prec_${gi}_${ai}`]='yes'; });
   });
-  saveRatings();
-  renderPrecisionContent();
+  saveRatings(); renderPrecisionContent();
 }
 
 function computeRetrieverMetrics() {
   const results = DATA.results || [];
   const metrics = {};
 
-  [5,10,15].forEach(k => {
-    let totalPrec = 0, totalQueries = 0;
-    let totalDCG = 0;
-
-    results.filter(r => r.top_k === k).forEach(r => {
-      const gi = results.indexOf(r);
-      const arts = r.articles || [];
-      if (arts.length === 0) return;
-
-      totalQueries++;
-      let relCount = 0;
-      let dcg = 0, idcg = 0;
-
-      // Идеальное DCG (если все релевантны)
-      arts.forEach((_,i) => { idcg += 1 / Math.log2(i+2); });
-
-      arts.forEach((a,ai) => {
-        const val = RATINGS[`prec_${gi}_${ai}`];
-        const isRel = val === 'yes' || val === 'partial';
-        if (isRel) {
-          relCount++;
-          dcg += 1 / Math.log2(ai+2);
-        }
+  TOP_K_VALUES.forEach(k => {
+    let totalPrec=0, totalDCG=0, totalQ=0;
+    results.filter(r=>r.top_k===k).forEach(r=>{
+      const gi=results.indexOf(r), arts=r.articles||[];
+      if(!arts.length) return;
+      totalQ++;
+      let relCount=0, dcg=0, idcg=0;
+      arts.forEach((_,i)=>{ idcg += 1/Math.log2(i+2); });
+      arts.forEach((a,ai)=>{
+        const v=RATINGS[`prec_${gi}_${ai}`];
+        if(v==='yes'||v==='partial'){ relCount++; dcg+=1/Math.log2(ai+2); }
       });
-
-      totalPrec += relCount / arts.length;
-      totalDCG += idcg > 0 ? dcg / idcg : 0;
+      totalPrec += relCount/arts.length;
+      totalDCG  += idcg>0 ? dcg/idcg : 0;
     });
-
-    const n = Math.max(totalQueries, 1);
-    metrics[k] = {
-      precision: (totalPrec / n).toFixed(3),
-      ndcg: (totalDCG / n).toFixed(3),
-      queries: totalQueries,
-    };
+    const n=Math.max(totalQ,1);
+    metrics[k]={ precision:(totalPrec/n).toFixed(3), ndcg:(totalDCG/n).toFixed(3), queries:totalQ };
   });
 
-  // Delta Precision
-  const dp10_5 = (parseFloat(metrics[10]?.precision||0) - parseFloat(metrics[5]?.precision||0)).toFixed(3);
-  const dp15_10 = (parseFloat(metrics[15]?.precision||0) - parseFloat(metrics[10]?.precision||0)).toFixed(3);
+  // delta: сравниваем соседние top_k
+  const kList = TOP_K_VALUES;
+  const deltas = kList.slice(1).map((k,i)=>{
+    const d = (parseFloat(metrics[k]?.precision||0)-parseFloat(metrics[kList[i]]?.precision||0)).toFixed(3);
+    return { label:`Top-${k} vs Top-${kList[i]}`, value:d };
+  });
 
   const html = `
     <div class="notice notice-success">✓ Метрики Retriever + Reranker вычислены</div>
     <table class="breakdown-table">
       <thead><tr><th>Top-K</th><th>Precision@K</th><th>NDCG@K</th><th>Запросов</th></tr></thead>
       <tbody>
-        ${[5,10,15].map(k=>`<tr>
-          <td><b>Top-${k}</b></td>
-          <td class="val-good">${metrics[k]?.precision}</td>
-          <td class="val-good">${metrics[k]?.ndcg}</td>
-          <td>${metrics[k]?.queries}</td>
-        </tr>`).join('')}
+        ${kList.map(k=>`<tr><td><b>Top-${k}</b></td><td class="val-good">${metrics[k]?.precision}</td><td class="val-good">${metrics[k]?.ndcg}</td><td>${metrics[k]?.queries}</td></tr>`).join('')}
       </tbody>
     </table>
     <div class="divider"></div>
-    <div class="summary-title" style="font-size:15px">delta-Precision@K (прирост от переранжирования)</div>
+    <div class="summary-title" style="font-size:15px">delta-Precision@K</div>
     <div class="metrics-grid" style="margin-top:12px">
-      <div class="metric-card">
-        <div class="metric-name">Top-10 vs Top-5</div>
-        <div class="metric-value" style="${dp10_5>=0?'color:var(--green)':'color:var(--red)'}">${dp10_5>=0?'+':''}${dp10_5}</div>
+      ${deltas.map(d=>`<div class="metric-card">
+        <div class="metric-name">${d.label}</div>
+        <div class="metric-value" style="color:${parseFloat(d.value)>=0?'var(--green)':'var(--red)'}">${parseFloat(d.value)>=0?'+':''}${d.value}</div>
         <div class="metric-sub">Изменение Precision при увеличении Top-K</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-name">Top-15 vs Top-10</div>
-        <div class="metric-value" style="${dp15_10>=0?'color:var(--green)':'color:var(--red)'}">${dp15_10>=0?'+':''}${dp15_10}</div>
-        <div class="metric-sub">Изменение Precision при увеличении Top-K</div>
-      </div>
-    </div>
-  `;
+      </div>`).join('')}
+    </div>`;
 
   document.getElementById('retriever-results').innerHTML = html;
   document.getElementById('retriever-results').classList.remove('hide');
   document.getElementById('ndcg-body').innerHTML = html;
-
-  // Сохраняем для итогового отчёта
   RATINGS['_retriever_metrics'] = metrics;
-  RATINGS['_delta_precision'] = { dp10_5, dp15_10 };
+  RATINGS['_deltas'] = deltas;
   saveRatings();
 }
 
-// ─── 4. Extractor ─────────────────────────────────────────────────────────────
-let currentExtTab = 'cs';
+// 4. Field Accuracy (top_k=EVAL_TOP_K, has_facts===true) 
+let extDomain = DOMAIN_KEYS[0];
 
 function renderExtractorSection() {
-  const tabsEl = document.getElementById('extractor-tabs');
-  tabsEl.innerHTML = ['cs','math','physics'].map(d =>
-    `<div class="tab ${d===currentExtTab?'active':''}" onclick="switchExtTab('${d}')">${DOMAINS[d]}</div>`
-  ).join('');
+  document.getElementById('extractor-tabs').innerHTML =
+    DOMAIN_KEYS.map(d=>
+      `<div class="tab ${d===extDomain?'active':''}" onclick="extDomain='${d}';renderExtractorSection()">${DOMAINS[d]}</div>`
+    ).join('');
   renderExtractorContent();
 }
 
-function switchExtTab(d) { currentExtTab = d; renderExtractorSection(); }
-
 function renderExtractorContent() {
-  // Берём первые 10 запросов из домена (по top_k=10) для оценки
-  const results = (DATA.results||[])
-    .filter(r => r.domain===currentExtTab && r.top_k===10)
-    .slice(0, 10);
-
+  // Берём прогоны с top_k=EVAL_TOP_K для данного домена
+  const results = (DATA.results||[]).filter(r=>r.domain===extDomain && r.top_k===EVAL_TOP_K);
   const FACT_FIELDS = ['problem','gap','methods','datasets','metrics'];
   const FACT_LABELS = {problem:'Problem',gap:'Gap',methods:'Methods',datasets:'Datasets',metrics:'Metrics'};
 
-  let html = '';
-  results.forEach((r, qi) => {
+  let html='';
+  results.forEach((r,qi)=>{
     const gi = DATA.results.indexOf(r);
-    const arts = (r.articles_with_facts||r.articles||[]).filter(a => a.facts);
+    // Только статьи где has_facts===true
+    const arts = (r.articles_with_facts||[]).filter(a=>a.has_facts===true);
 
-    if (arts.length === 0) {
-      html += `<div class="query-card">
+    if(!arts.length){
+      html+=`<div class="query-card">
         <div class="query-header">
           <div class="query-num">${qi+1}.</div>
           <div class="query-text">${r.query}</div>
-          <span class="query-status status-pending">Нет фактов</span>
+          <span class="query-status status-pending">Нет статей с фактами</span>
         </div>
       </div>`;
       return;
     }
 
-    const doneCount = arts.filter((a,ai) =>
-      FACT_FIELDS.some(f => RATINGS[`fact_${gi}_${ai}_${f}`] !== undefined)
-    ).length;
-    const statusClass = doneCount===0?'status-pending':doneCount===arts.length?'status-done':'status-partial';
+    const done = arts.filter((a,ai)=>FACT_FIELDS.some(f=>RATINGS[`fact_${gi}_${ai}_${f}`]!==undefined)).length;
+    const sc = done===0?'status-pending':done===arts.length?'status-done':'status-partial';
 
-    html += `<div class="query-card">
+    html+=`<div class="query-card">
       <div class="query-header" onclick="toggleCard('ext-${gi}')">
         <div class="query-num">${qi+1}.</div>
         <div class="query-text">${r.query}</div>
-        <span class="query-badge ${currentExtTab}">${currentExtTab.toUpperCase()}</span>
-        <span class="query-status ${statusClass}">${doneCount}/${arts.length} статей</span>
+        <span class="query-badge">${extDomain.toUpperCase()}</span>
+        <span class="query-status ${sc}">${done}/${arts.length} статей</span>
         <span class="chevron" id="chev-ext-${gi}">▼</span>
       </div>
       <div class="query-body" id="ext-${gi}">
-        ${arts.slice(0,3).map((a,ai) => {
-          const facts = a.facts||{};
+        ${arts.slice(0,3).map((a,ai)=>{
+          const facts=a.facts||{};
           return `<div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
             <div style="font-weight:600;font-size:14px;margin-bottom:4px">${a.title||'—'}</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px">${a.abstract||''}</div>
             <div class="facts-grid">
-              ${FACT_FIELDS.map(f => {
-                const val = Array.isArray(facts[f]) ? facts[f].join(', ') : (facts[f]||'—');
-                const rKey = `fact_${gi}_${ai}_${f}`;
-                const rv = RATINGS[rKey];
+              ${FACT_FIELDS.map(f=>{
+                const val=Array.isArray(facts[f])?facts[f].join(', '):(facts[f]||'—');
+                const rKey=`fact_${gi}_${ai}_${f}`, rv=RATINGS[rKey];
                 return `<div class="fact-item">
                   <div class="fact-label">${FACT_LABELS[f]}</div>
                   <div class="fact-value">${val==='—'?'<em style="color:var(--text3)">не извлечено</em>':val}</div>
                   <div class="fact-accuracy">
-                    <label>Точность извлечения:</label>
+                    <label>Точность:</label>
                     <div class="acc-btns">
                       <span class="acc-btn ${rv==='correct'?'sel-correct':''}" onclick="setFact(${gi},${ai},'${f}','correct')">✓ Верно</span>
                       <span class="acc-btn ${rv==='partial'?'sel-partial':''}" onclick="setFact(${gi},${ai},'${f}','partial')">~ Частично</span>
@@ -1103,38 +701,32 @@ function renderExtractorContent() {
   });
 
   document.getElementById('extractor-content').innerHTML = html || '<div class="notice notice-info">Нет данных.</div>';
+  applyOpenCards();
 }
 
-function setFact(gi, ai, field, val) {
-  RATINGS[`fact_${gi}_${ai}_${field}`] = val;
-  saveRatings();
-  renderExtractorContent();
+function setFact(gi,ai,field,val){
+  RATINGS[`fact_${gi}_${ai}_${field}`]=val;
+  saveRatings(); renderExtractorContent();
 }
 
-function computeFieldAccuracy() {
-  const FACT_FIELDS = ['problem','gap','methods','datasets','metrics'];
-  const counts = {};
-  const totals = {};
-  FACT_FIELDS.forEach(f => { counts[f] = {correct:0,partial:0,wrong:0}; totals[f] = 0; });
-
-  Object.entries(RATINGS).forEach(([k,v]) => {
-    if (!k.startsWith('fact_')) return;
-    const parts = k.split('_');
-    const field = parts[parts.length-1];
-    if (!counts[field]) return;
-    totals[field]++;
-    counts[field][v] = (counts[field][v]||0) + 1;
+function computeFieldAccuracy(){
+  const FACT_FIELDS=['problem','gap','methods','datasets','metrics'];
+  const counts={}, totals={};
+  FACT_FIELDS.forEach(f=>{counts[f]={correct:0,partial:0,wrong:0};totals[f]=0;});
+  Object.entries(RATINGS).forEach(([k,v])=>{
+    if(!k.startsWith('fact_')) return;
+    const parts=k.split('_'), field=parts[parts.length-1];
+    if(!counts[field]) return;
+    totals[field]++; counts[field][v]=(counts[field][v]||0)+1;
   });
-
-  const html = `
-    <div class="notice notice-success">✓ Field Accuracy вычислена</div>
+  const html=`
+    <div class="notice notice-success">✓ Field Accuracy вычислена (только статьи с has_facts=true)</div>
     <table class="breakdown-table">
-      <thead><tr><th>Поле</th><th>Верно</th><th>Частично</th><th>Неверно</th><th>Accuracy (верно+частично)</th></tr></thead>
+      <thead><tr><th>Поле</th><th>Верно</th><th>Частично</th><th>Неверно</th><th>Accuracy</th></tr></thead>
       <tbody>
-        ${FACT_FIELDS.map(f => {
-          const t = totals[f]||1;
-          const c = counts[f];
-          const acc = ((c.correct+c.partial*0.5)/t);
+        ${FACT_FIELDS.map(f=>{
+          const t=totals[f]||1, c=counts[f];
+          const acc=(c.correct+c.partial*0.5)/t;
           return `<tr>
             <td><b>${f}</b></td>
             <td class="val-good">${((c.correct/t)*100).toFixed(0)}%</td>
@@ -1144,75 +736,51 @@ function computeFieldAccuracy() {
           </tr>`;
         }).join('')}
       </tbody>
-    </table>
-  `;
-
-  document.getElementById('extractor-results').innerHTML = html;
+    </table>`;
+  document.getElementById('extractor-results').innerHTML=html;
   document.getElementById('extractor-results').classList.remove('hide');
-  RATINGS['_field_accuracy'] = { counts, totals };
-  saveRatings();
+  RATINGS['_field_accuracy']={counts,totals}; saveRatings();
 }
 
-// ─── 5. Topics ────────────────────────────────────────────────────────────────
-let currentTopTab = 'cs';
+// 5. Topics (top_k=EVAL_TOP_K) 
+let topDomain = DOMAIN_KEYS[0];
 
-function renderTopicsSection() {
-  const tabsEl = document.getElementById('topics-tabs');
-  tabsEl.innerHTML = ['cs','math','physics'].map(d =>
-    `<div class="tab ${d===currentTopTab?'active':''}" onclick="switchTopTab('${d}')">${DOMAINS[d]}</div>`
-  ).join('');
+function renderTopicsSection(){
+  document.getElementById('topics-tabs').innerHTML =
+    DOMAIN_KEYS.map(d=>
+      `<div class="tab ${d===topDomain?'active':''}" onclick="topDomain='${d}';renderTopicsSection()">${DOMAINS[d]}</div>`
+    ).join('');
   renderTopicsContent();
 }
 
-function switchTopTab(d) { currentTopTab = d; renderTopicsSection(); }
+function renderTopicsContent(){
+  // top_k=EVAL_TOP_K 
+  const results=(DATA.results||[]).filter(r=>r.domain===topDomain && r.top_k===EVAL_TOP_K && (r.topics||[]).length>0);
 
-function renderTopicsContent() {
-  const results = (DATA.results||[])
-    .filter(r => r.domain===currentTopTab && r.top_k===10 && (r.topics||[]).length > 0)
-    .slice(0, 10);
+  let html='';
+  results.forEach((r,qi)=>{
+    const gi=DATA.results.indexOf(r), topics=r.topics||[];
+    const done=topics.filter((_,ti)=>RATINGS[`rel_${gi}_${ti}`]!==undefined).length;
+    const sc=done===0?'status-pending':done===topics.length?'status-done':'status-partial';
 
-  let html = '';
-  results.forEach((r, qi) => {
-    const gi = DATA.results.indexOf(r);
-    const topics = r.topics||[];
-    const doneCount = topics.filter((_,ti) =>
-      RATINGS[`rel_${gi}_${ti}`] !== undefined
-    ).length;
-    const statusClass = doneCount===0?'status-pending':doneCount===topics.length?'status-done':'status-partial';
-
-    html += `<div class="query-card">
+    html+=`<div class="query-card">
       <div class="query-header" onclick="toggleCard('top-${gi}')">
         <div class="query-num">${qi+1}.</div>
         <div class="query-text">${r.query}</div>
-        <span class="query-badge ${currentTopTab}">${currentTopTab.toUpperCase()}</span>
-        <span class="query-status ${statusClass}">${doneCount}/${topics.length} тем</span>
+        <span class="query-badge">${topDomain.toUpperCase()}</span>
+        <span class="query-status ${sc}">${done}/${topics.length} тем</span>
         <span class="chevron" id="chev-top-${gi}">▼</span>
       </div>
       <div class="query-body" id="top-${gi}">
-        ${topics.map((t,ti) => {
-          const relKey = `rel_${gi}_${ti}`;
-          const relVal = RATINGS[relKey];
+        ${topics.map((t,ti)=>{
+          const relVal=RATINGS[`rel_${gi}_${ti}`];
           return `<div class="topic-card" style="margin-top:12px">
-            <div class="topic-header">
-              <span class="topic-num">${ti+1}.</span>${t.title||'—'}
-            </div>
+            <div class="topic-header"><span class="topic-num">${ti+1}.</span>${t.title||'—'}</div>
             <div class="topic-body">
-              ${t.rationale?`<div class="topic-section">
-                <div class="topic-section-label">Почему сейчас</div>
-                <div class="topic-section-text">${t.rationale}</div>
-              </div>`:''}
-              ${t.approach?`<div class="topic-section">
-                <div class="topic-section-label">Подход</div>
-                <div class="topic-section-text">${t.approach}</div>
-              </div>`:''}
-              ${(t.datasets||[]).length?`<div class="topic-section">
-                <div class="topic-section-label">Датасеты</div>
-                <div>${(t.datasets||[]).map(d=>`<span class="tag">${d}</span>`).join('')}</div>
-              </div>`:''}
-              ${(t.sources||[]).length?`<div class="topic-section">
-                <div class="topic-section-label">Источники</div>
-                <div>${(t.sources||[]).map(s=>`<div style="font-size:12px"><a href="${s}" target="_blank" style="color:var(--accent)">${s}</a></div>`).join('')}</div>
-              </div>`:''}
+              ${t.rationale?`<div class="topic-section"><div class="topic-section-label">Обоснование</div><div class="topic-section-text">${t.rationale}</div></div>`:''}
+              ${t.approach?`<div class="topic-section"><div class="topic-section-label">Подход</div><div class="topic-section-text">${t.approach}</div></div>`:''}
+              ${(t.datasets||[]).length?`<div class="topic-section"><div class="topic-section-label">Датасеты</div><div>${t.datasets.map(d=>`<span class="tag">${d}</span>`).join('')}</div></div>`:''}
+              ${(t.sources||[]).length?`<div class="topic-section"><div class="topic-section-label">Источники</div><div>${t.sources.map(s=>`<div style="font-size:12px"><a href="${s}" target="_blank" style="color:var(--accent)">${s}</a></div>`).join('')}</div></div>`:''}
             </div>
             <div class="topic-eval">
               <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
@@ -1228,15 +796,11 @@ function renderTopicsContent() {
                   <table class="expert-table">
                     ${CRITERIA.map((c,ci)=>`<tr>
                       <td>${CRITERIA_LABELS[ci]}</td>
-                      <td>
-                        <div class="stars" id="stars_${gi}_${ti}_${c}">
-                          ${[1,2,3,4,5].map(n=>`<span class="star ${(RATINGS[`score_${gi}_${ti}_${c}`]||0)>=n?'active':''}"
-                            onclick="setStar(${gi},${ti},'${c}',${n})" data-n="${n}">★</span>`).join('')}
-                        </div>
-                      </td>
-                      <td style="font-size:12px;color:var(--text3);min-width:60px">
-                        ${RATINGS[`score_${gi}_${ti}_${c}`]?RATINGS[`score_${gi}_${ti}_${c}`]+'/5':'—'}
-                      </td>
+                      <td><div class="stars">
+                        ${[1,2,3,4,5].map(n=>`<span class="star ${(RATINGS[`score_${gi}_${ti}_${c}`]||0)>=n?'active':''}"
+                          onclick="setStar(${gi},${ti},'${c}',${n})">★</span>`).join('')}
+                      </div></td>
+                      <td style="font-size:12px;color:var(--text3);min-width:50px">${RATINGS[`score_${gi}_${ti}_${c}`]||'—'}/5</td>
                     </tr>`).join('')}
                   </table>
                 </div>
@@ -1247,122 +811,72 @@ function renderTopicsContent() {
       </div>
     </div>`;
   });
-  document.getElementById('topics-content').innerHTML = html || '...';
 
-  if (window.MathJax) {
-      MathJax.typesetPromise([document.getElementById('topics-content')]);
-  }
+  document.getElementById('topics-content').innerHTML = html || '<div class="notice notice-info">Нет тем для этого домена с top_k='+EVAL_TOP_K+'.</div>';
+  applyOpenCards();
 }
 
+function setRel(gi,ti,val){ RATINGS[`rel_${gi}_${ti}`]=val; saveRatings(); renderTopicsContent(); }
+function setStar(gi,ti,c,n){ RATINGS[`score_${gi}_${ti}_${c}`]=n; saveRatings(); renderTopicsContent(); }
 
-function setRel(gi, ti, val) {
-  RATINGS[`rel_${gi}_${ti}`] = val;
-  saveRatings();
-  renderTopicsContent();
-}
-
-function setStar(gi, ti, criterion, n) {
-  RATINGS[`score_${gi}_${ti}_${criterion}`] = n;
-  saveRatings();
-  renderTopicsContent();
-}
-
-function computeTopicMetrics() {
-  let relCount = 0, totalTopics = 0;
-  const criteriaScores = {};
-  CRITERIA.forEach(c => criteriaScores[c] = []);
-
-  Object.entries(RATINGS).forEach(([k, v]) => {
-    if (k.startsWith('rel_')) {
-      totalTopics++;
-      if (v === 'yes') relCount++;
-    }
-    if (k.startsWith('score_')) {
-      const c = k.split('_').pop();
-      if (criteriaScores[c]) criteriaScores[c].push(v);
-    }
+function computeTopicMetrics(){
+  let relCount=0, total=0;
+  const scores={};
+  CRITERIA.forEach(c=>scores[c]=[]);
+  Object.entries(RATINGS).forEach(([k,v])=>{
+    if(k.startsWith('rel_')){ total++; if(v==='yes') relCount++; }
+    if(k.startsWith('score_')){ const c=k.split('_').pop(); if(scores[c]) scores[c].push(v); }
   });
+  const relRate=total>0?(relCount/total).toFixed(3):'0.000';
+  const avg=arr=>arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2):'—';
 
-  const relRate = totalTopics > 0 ? (relCount/totalTopics).toFixed(3) : '0.000';
-  const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2) : '—';
-
-  const html = `
-    <div class="notice notice-success">✓ Метрики Generator вычислены</div>
+  const html=`
+    <div class="notice notice-success">✓ Метрики Generator вычислены (top_k=${EVAL_TOP_K})</div>
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-name">Relevance@K</div>
         <div class="metric-value">${(parseFloat(relRate)*100).toFixed(1)}%</div>
-        <div class="metric-sub">${relCount} из ${totalTopics} тем релевантны</div>
+        <div class="metric-sub">${relCount} из ${total} тем релевантны</div>
       </div>
       ${CRITERIA.map((c,ci)=>`<div class="metric-card">
         <div class="metric-name">${CRITERIA_LABELS[ci]}</div>
-        <div class="metric-value" style="font-size:22px">${avg(criteriaScores[c])}</div>
-        <div class="metric-sub">Среднее по ${criteriaScores[c].length} оценкам (шкала 1–5)</div>
+        <div class="metric-value" style="font-size:22px">${avg(scores[c])}</div>
+        <div class="metric-sub">Среднее по ${scores[c].length} оценкам (1–5)</div>
       </div>`).join('')}
-    </div>
-  `;
-
-  document.getElementById('topics-results').innerHTML = html;
+    </div>`;
+  document.getElementById('topics-results').innerHTML=html;
   document.getElementById('topics-results').classList.remove('hide');
-  RATINGS['_topic_metrics'] = { relRate, criteriaScores: Object.fromEntries(Object.entries(criteriaScores).map(([k,v])=>[k,avg(v)])) };
+  RATINGS['_topic_metrics']={relRate,scores:Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,avg(v)]))};
   saveRatings();
 }
 
-// ─── 6. Итоговый отчёт ───────────────────────────────────────────────────────
-function generateFinalReport() {
-  const s = DATA.summary || {};
-  const jpr = s.json_parse_rates||{};
-  const cr = s.coverage_rate||{};
-  const tc = s.topic_coherence||{};
-  const ttr = s.time_to_result||{};
-  const rm = RATINGS['_retriever_metrics']||{};
-  const dp = RATINGS['_delta_precision']||{};
-  const fa = RATINGS['_field_accuracy']||{};
-  const tm = RATINGS['_topic_metrics']||{};
+// 6. Итоговый отчёт 
+function generateFinalReport(){
+  const s=DATA.summary||{};
+  const jpr=s.json_parse_rates||{}, tc=s.topic_coherence||{}, ttr=s.time_to_result||{};
+  const rm=RATINGS['_retriever_metrics']||{}, deltas=RATINGS['_deltas']||[];
+  const fa=RATINGS['_field_accuracy']||{}, tm=RATINGS['_topic_metrics']||{};
+  const pct=v=>v!=null?(parseFloat(v)*100).toFixed(1)+'%':'—';
+  const cls=v=>{const n=parseFloat(v);return n>=0.8?'val-good':n>=0.5?'val-mid':'val-bad';};
+  const FACT_FIELDS=['problem','gap','methods','datasets','metrics'];
 
-  const pct = v => v!=null?(parseFloat(v)*100).toFixed(1)+'%':'—';
-  const colorClass = v => {const n=parseFloat(v); return n>=0.8?'val-good':n>=0.5?'val-mid':'val-bad';};
+  const faTable=fa.totals?FACT_FIELDS.map(f=>{
+    const t=fa.totals[f]||1, c=fa.counts?.[f]||{};
+    const acc=(c.correct+c.partial*0.5)/t;
+    return `<tr><td><b>${f}</b></td><td class="${cls(acc)}">${(acc*100).toFixed(1)}%</td></tr>`;
+  }).join(''):'<tr><td colspan="2">Не оценено</td></tr>';
 
-  const FACT_FIELDS = ['problem','gap','methods','datasets','metrics'];
-  const faTable = fa.totals ? FACT_FIELDS.map(f => {
-    const t = fa.totals[f]||1;
-    const c = fa.counts?.[f]||{};
-    const acc = ((c.correct+c.partial*0.5)/t);
-    return `<tr><td><b>${f}</b></td><td class="${colorClass(acc)}">${(acc*100).toFixed(1)}%</td></tr>`;
-  }).join('') : '<tr><td colspan="2">Не оценено</td></tr>';
-
-  document.getElementById('final-body').innerHTML = `
-    <div class="notice notice-success">✅ Итоговый отчёт сформирован. Используйте кнопку «Экспорт» для сохранения.</div>
+  document.getElementById('final-body').innerHTML=`
+    <div class="notice notice-success">✅ Итоговый отчёт сформирован.</div>
 
     <div class="summary-section">
       <div class="summary-title">Машинные метрики</div>
       <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-name">Time-to-Result (медиана)</div>
-          <div class="metric-value">${ttr.median||'—'}с</div>
-          <div class="metric-sub">Среднее: ${ttr.mean||'—'}с</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-name">Planner JSON Parse</div>
-          <div class="metric-value ${colorClass(jpr.planner||0)}">${pct(jpr.planner)}</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-name">Extractor JSON Parse</div>
-          <div class="metric-value ${colorClass(jpr.extractor||0)}">${pct(jpr.extractor)}</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-name">Generator JSON Parse</div>
-          <div class="metric-value ${colorClass(jpr.generator||0)}">${pct(jpr.generator)}</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-name">Coverage Rate (avg)</div>
-          <div class="metric-value">${((((cr.cs||0)+(cr.math||0)+(cr.physics||0))/3)*100).toFixed(1)}%</div>
-          <div class="metric-sub">CS: ${pct(cr.cs)} · Math: ${pct(cr.math)} · Physics: ${pct(cr.physics)}</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-name">Topic Coherence</div>
-          <div class="metric-value ${colorClass(tc.overall||0)}">${(tc.overall||0).toFixed(3)}</div>
-        </div>
+        <div class="metric-card"><div class="metric-name">Time-to-Result (медиана)</div><div class="metric-value">${ttr.median||'—'}с</div><div class="metric-sub">Среднее: ${ttr.mean||'—'}с</div></div>
+        <div class="metric-card"><div class="metric-name">Planner JSON Parse</div><div class="metric-value ${cls(jpr.planner||0)}">${pct(jpr.planner)}</div></div>
+        <div class="metric-card"><div class="metric-name">Extractor JSON Parse</div><div class="metric-value ${cls(jpr.extractor||0)}">${pct(jpr.extractor)}</div></div>
+        <div class="metric-card"><div class="metric-name">Generator JSON Parse</div><div class="metric-value ${cls(jpr.generator||0)}">${pct(jpr.generator)}</div></div>
+        <div class="metric-card"><div class="metric-name">Topic Coherence</div><div class="metric-value ${cls(tc.overall||0)}">${(tc.overall||0).toFixed(3)}</div></div>
       </div>
     </div>
 
@@ -1371,25 +885,20 @@ function generateFinalReport() {
       <table class="breakdown-table">
         <thead><tr><th>Top-K</th><th>Precision@K</th><th>NDCG@K</th></tr></thead>
         <tbody>
-          ${[5,10,15].map(k=>`<tr>
-            <td>Top-${k}</td>
-            <td class="val-good">${rm[k]?.precision||'—'}</td>
-            <td class="val-good">${rm[k]?.ndcg||'—'}</td>
-          </tr>`).join('')}
+          ${TOP_K_VALUES.map(k=>`<tr><td>Top-${k}</td><td class="val-good">${rm[k]?.precision||'—'}</td><td class="val-good">${rm[k]?.ndcg||'—'}</td></tr>`).join('')}
         </tbody>
       </table>
       <div class="divider"></div>
       <table class="breakdown-table">
         <thead><tr><th>delta-Precision</th><th>Значение</th></tr></thead>
         <tbody>
-          <tr><td>Top-10 vs Top-5</td><td class="${parseFloat(dp.dp10_5||0)>=0?'val-good':'val-bad'}">${dp.dp10_5>=0?'+':''}${dp.dp10_5||'—'}</td></tr>
-          <tr><td>Top-15 vs Top-10</td><td class="${parseFloat(dp.dp15_10||0)>=0?'val-good':'val-bad'}">${dp.dp15_10>=0?'+':''}${dp.dp15_10||'—'}</td></tr>
+          ${(deltas||[]).map(d=>`<tr><td>${d.label}</td><td class="${parseFloat(d.value)>=0?'val-good':'val-bad'}">${parseFloat(d.value)>=0?'+':''}${d.value}</td></tr>`).join('')}
         </tbody>
       </table>
     </div>
 
     <div class="summary-section">
-      <div class="summary-title">Extractor — Field Accuracy</div>
+      <div class="summary-title">Extractor — Field Accuracy (статьи с has_facts=true, top_k=${EVAL_TOP_K})</div>
       <table class="breakdown-table">
         <thead><tr><th>Поле</th><th>Accuracy (верно + 0.5×частично)</th></tr></thead>
         <tbody>${faTable}</tbody>
@@ -1397,55 +906,35 @@ function generateFinalReport() {
     </div>
 
     <div class="summary-section">
-      <div class="summary-title">Generator — Relevance@K и Экспертные оценки</div>
+      <div class="summary-title">Generator — Relevance@K и Экспертные оценки (top_k=${EVAL_TOP_K})</div>
       <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-name">Relevance@K</div>
-          <div class="metric-value">${tm.relRate?((parseFloat(tm.relRate))*100).toFixed(1)+'%':'—'}</div>
-          <div class="metric-sub">Доля релевантных тем</div>
-        </div>
-        ${CRITERIA.map((c,ci)=>`<div class="metric-card">
-          <div class="metric-name">${CRITERIA_LABELS[ci]}</div>
-          <div class="metric-value" style="font-size:22px">${tm.criteriaScores?.[c]||'—'}</div>
-          <div class="metric-sub">Средний балл / 5</div>
-        </div>`).join('')}
+        <div class="metric-card"><div class="metric-name">Relevance@K</div><div class="metric-value">${tm.relRate?((parseFloat(tm.relRate))*100).toFixed(1)+'%':'—'}</div></div>
+        ${CRITERIA.map((c,ci)=>`<div class="metric-card"><div class="metric-name">${CRITERIA_LABELS[ci]}</div><div class="metric-value" style="font-size:22px">${tm.scores?.[c]||'—'}</div><div class="metric-sub">Ср. балл / 5</div></div>`).join('')}
       </div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-success" onclick="exportResults()">⬇ Экспортировать все оценки в JSON</button>
-    </div>
-  `;
+      <button class="btn btn-success" onclick="exportResults()">⬇ Экспортировать оценки в JSON</button>
+    </div>`;
 }
 
-// ─── Экспорт ──────────────────────────────────────────────────────────────────
-function exportResults() {
-  const exportData = {
-    exported_at: new Date().toISOString(),
-    machine_metrics: DATA?.summary || {},
-    expert_ratings: RATINGS,
-  };
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `eval_expert_${new Date().toISOString().slice(0,10)}.json`;
+// Экспорт 
+function exportResults(){
+  const blob=new Blob([JSON.stringify({exported_at:new Date().toISOString(),machine_metrics:DATA?.summary||{},expert_ratings:RATINGS},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`eval_expert_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
 }
 
-// ─── Drag & Drop ─────────────────────────────────────────────────────────────
-const dropZone = document.getElementById('drop-zone');
-dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('active'); });
-dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('active'));
-dropZone?.addEventListener('drop', e => {
+// Drag & Drop 
+const dz=document.getElementById('drop-zone');
+dz?.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('active');});
+dz?.addEventListener('dragleave',()=>dz.classList.remove('active'));
+dz?.addEventListener('drop',e=>{
   e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file) {
-    const inp = document.getElementById('file-input');
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    inp.files = dt.files;
-    loadFile(inp);
-  }
+  const f=e.dataTransfer.files[0];
+  if(f){const inp=document.getElementById('file-input');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;loadFile(inp);}
 });
 </script>
 </body>

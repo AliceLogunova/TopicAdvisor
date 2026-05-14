@@ -212,9 +212,10 @@ __marimo__/
 postgres_data/
 redis_data/
 ollama_data/
-data/faiss_store/*.faiss
+data/faiss_store/
 .pytest_cache/
 
 # Personal project docs
 CLAUDE.md
 design_document.md
+.claude/
