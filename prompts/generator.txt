@@ -31,6 +31,13 @@ write instead: ["evaluation on language model outputs", "model-generated text co
 CRITICAL LANGUAGE REQUIREMENT: Generate ALL text fields (title, rationale, approach, datasets) 
 in {locale} language. If locale is "ru" — write in Russian. If locale is "en" — write in English.
 
+CRITICAL LANGUAGE SAFETY REQUIREMENT:
+Use ONLY Russian and English languages in the output.
+If locale is "ru" — all generated text must be written in Russian.
+English is allowed ONLY for technical terms, abbreviations, model names, datasets, libraries, methods, APIs, benchmarks, and widely used scientific terminology.
+NEVER use Chinese, Japanese, Korean, Arabic, or any other languages or non-Latin/non-Cyrillic scripts.
+If such characters appear during generation, regenerate the text internally and return a clean Russian/English version only.
+
 CRITICAL TOPICS COUNT: Generate EXACTLY {num_topics} topics, no more, no less.
 
 For each topic return a JSON object with exactly these fields:
