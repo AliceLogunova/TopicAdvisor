@@ -62,8 +62,8 @@ def _build_context(articles: list[dict]) -> str:
         abstract = article.get("abstract", "")[:max_abstract]
         facts = article.get("facts")
 
-        part = f"[{i}] {title}\nSOURCE URL (use this in sources field): {url}\nAbstract: {abstract}"
-
+        part = f"PAPER\nTitle: {title}\nSOURCE URL (use this in sources field): {url}\nAbstract: {abstract}"
+        
         if facts:
             if facts.get("problem"):
                 part += f"\nProblem: {facts['problem']}"
@@ -79,6 +79,13 @@ def _build_context(articles: list[dict]) -> str:
         parts.append(part)
 
     return "\n\n---\n\n".join(parts)
+
+
+def _count_sentences(text: str) -> int:
+    """Подсчёт предложений по знакам завершения."""
+    if not text:
+        return 0
+    return len(re.findall(r'[.!?]+', text))
 
 
 def _parse_topics(response_text: str) -> list[GeneratedTopic]:
@@ -131,10 +138,23 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
     # Дедупликация источников в каждой теме
     for t in unique_topics:
         t.sources = list(dict.fromkeys(t.sources))
+        if t.rationale:
+            t.rationale = _clean_citations(t.rationale)
+        if t.approach:
+            t.approach = _clean_citations(t.approach)
+        if t.title:
+            t.title = _clean_citations(t.title)
 
     # Фильтруем темы с менее чем 2 источниками
     filtered = [t for t in unique_topics if len(t.sources) >= 2]
 
+    # После фильтра по 2+ источникам добавь:
+    filtered = [t for t in filtered if
+        _count_sentences(t.rationale or '') >= 4 and
+        _count_sentences(t.approach or '') >= 3
+    ]
+
+    logger.debug(f"Generator _parse_topics: после фильтра по длине={len(filtered)}")
     logger.debug(
         f"Generator _parse_topics: распарсено={len(topics)}, "
         f"уникальных={len(unique_topics)}, "
@@ -144,6 +164,21 @@ def _parse_topics(response_text: str) -> list[GeneratedTopic]:
     # Если все отфильтровались — вернуть как есть (лучше 1 тема чем ничего)
     return filtered if filtered else unique_topics
 
+import re
+
+def _clean_citations(text: str) -> str:
+    """Убирает артефакты цитирования вида [1], [2], (1), работа [3] и т.д."""
+    if not text:
+        return text
+    # Убираем [1], [2], [3], [4] и т.д.
+    text = re.sub(r'\[\d+\]', '', text)
+    # Убираем (1), (2) и т.д.
+    text = re.sub(r'\(\d+\)', '', text)
+    # Убираем "в работе [N]", "paper [N]", "работа [N]"
+    text = re.sub(r'\b(в работе|работа|paper|статья|источник)\s*\[\d+\]', '', text, flags=re.IGNORECASE)
+    # Чистим двойные пробелы
+    text = re.sub(r'  +', ' ', text).strip()
+    return text
 
 # Основная функция для генерации тем ВКР. Принимает список статей с фактами, параметры уровня и срока, желаемое количество тем.
 # Формирует контекст и промпт, отправляет запрос в LLM, парсит и валидирует результат.
@@ -215,7 +250,7 @@ async def generate_topics(
                 ],
                 options={
                     "temperature": 0.5,
-                    "num_predict": 6144,
+                    "num_predict": 8192,
                 },
                 think=False,
             )
