@@ -237,26 +237,14 @@
       </div>
     </div>
 
-    <!-- 3: NDCG -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-num">3</div>
-        <div>
-          <div class="section-title">NDCG@K и delta-Precision@K — Reranker</div>
-          <div class="section-desc">Вычисляется автоматически на основе оценок из шага 2.</div>
-        </div>
-      </div>
-      <div class="section-body" id="ndcg-body">
-        <div class="notice notice-info">ℹ Нажмите «Вычислить» в шаге 2 — метрика появится здесь автоматически.</div>
-      </div>
-    </div>
 
-    <!-- 4: Field Accuracy -->
+
+    <!-- 4: Extraction Coverage -->
     <div class="section">
       <div class="section-header">
         <div class="section-num">4</div>
         <div>
-          <div class="section-title">Field Accuracy — Extractor</div>
+          <div class="section-title">Extraction Coverage — Extractor</div>
           <div class="section-desc">Оцените корректность извлечения фактов: ✓ Верно / ~ Частично / ✗ Неверно. Только статьи с найденными фактами (has_facts=true).</div>
         </div>
       </div>
@@ -265,7 +253,7 @@
         <div class="tabs" id="extractor-tabs"></div>
         <div style="margin-top:16px" id="extractor-content"></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="computeFieldAccuracy()">✓ Вычислить Field Accuracy</button>
+          <button class="btn btn-primary" onclick="computeFieldAccuracy()">✓ Вычислить Extraction Coverage</button>
         </div>
         <div id="extractor-results" class="hide mt-16"></div>
       </div>
@@ -371,8 +359,18 @@ function saveRatings() {
 
 function updateProgress() {
   if (!DATA) return;
-  const total = (DATA.results||[]).length;
-  const done = Object.keys(RATINGS).filter(k => k.startsWith('prec_')).length;
+  // Считаем уникальные статьи по всем доменам
+  let total = 0, done = 0;
+  DOMAIN_KEYS.forEach(domain => {
+    const pool = buildArticlePool(domain);
+    pool.forEach((qmap, query) => {
+      qmap.forEach((a) => {
+        total++;
+        const k = precRatingKey(domain, query, a.arxiv_id || a.url || a.title);
+        if (RATINGS[k] !== undefined) done++;
+      });
+    });
+  });
   document.getElementById('progress-indicator').innerHTML = `Оценено: <span>${done}</span> / ${total} статей`;
   document.getElementById('export-btn').style.display = 'inline-flex';
 }
@@ -458,9 +456,33 @@ function renderAutoMetrics() {
   `;
 }
 
-// 2. Precision@K 
+// 2. Precision@K
+// Оценки хранятся по ключу prec_ID_{arxiv_id} — один раз на статью независимо от top_k
 let precDomain = DOMAIN_KEYS[0];
-let precK = TOP_K_VALUES[0];
+
+// Возвращает дедуплицированный пул статей для домена: Map<query -> Article[]>
+// Article = { arxiv_id, title, url, primary_category, inTopK: Set }
+function buildArticlePool(domain) {
+  const pool = new Map(); // query -> Map<arxiv_id, article>
+  const results = DATA.results || [];
+  results.filter(r => r.domain === domain).forEach(r => {
+    if (!pool.has(r.query)) pool.set(r.query, new Map());
+    const qmap = pool.get(r.query);
+    (r.articles || []).forEach(a => {
+      const id = a.arxiv_id || a.url || a.title;
+      if (!qmap.has(id)) {
+        qmap.set(id, { ...a, inTopK: new Set() });
+      }
+      qmap.get(id).inTopK.add(r.top_k);
+    });
+  });
+  return pool;
+}
+
+function precRatingKey(domain, query, arxiv_id) {
+  // Безопасный составной ключ
+  return `prec_ID_${domain}__${query.slice(0,30)}__${arxiv_id}`;
+}
 
 function renderPrecisionSection() {
   document.getElementById('precision-domain-tabs').innerHTML =
@@ -469,46 +491,50 @@ function renderPrecisionSection() {
     ).join('');
 
   document.getElementById('precision-k-tabs').innerHTML =
-    TOP_K_VALUES.map(k =>
-      `<div class="tab ${k===precK?'active':''}" onclick="precK=${k};renderPrecisionSection()">Top-${k}</div>`
-    ).join('');
+    `<div style="padding:8px 16px;font-size:12px;color:var(--text3)">
+       Каждая статья оценивается <b>один раз</b>. Показаны все уникальные статьи по всем Top-K для данного домена.
+     </div>`;
 
   renderPrecisionContent();
 }
 
 function renderPrecisionContent() {
-  const results = (DATA.results||[]).filter(r => r.domain===precDomain && r.top_k===precK);
-  if (!results.length) {
-    document.getElementById('precision-content').innerHTML = '<div class="notice notice-info">Нет данных для этой комбинации.</div>';
+  const pool = buildArticlePool(precDomain);
+  if (!pool.size) {
+    document.getElementById('precision-content').innerHTML = '<div class="notice notice-info">Нет данных.</div>';
     return;
   }
   let html = '';
-  results.forEach((r, qi) => {
-    const gi = DATA.results.indexOf(r);
-    const arts = r.articles || [];
-    const done = arts.filter((_,ai) => RATINGS[`prec_${gi}_${ai}`] !== undefined).length;
+  let qi = 0;
+  pool.forEach((qmap, query) => {
+    qi++;
+    const arts = Array.from(qmap.values());
+    const done = arts.filter(a => {
+      const k = precRatingKey(precDomain, query, a.arxiv_id || a.url || a.title);
+      return RATINGS[k] !== undefined;
+    }).length;
     const sc = done===0?'status-pending':done===arts.length?'status-done':'status-partial';
     const sl = done===0?'Не оценено':done===arts.length?'Готово':`${done}/${arts.length}`;
+    const cardId = `prec-${precDomain}-${qi}`;
 
     html += `<div class="query-card">
-      <div class="query-header" onclick="toggleCard('prec-${gi}')">
-        <div class="query-num">${qi+1}.</div>
-        <div class="query-text">${r.query}</div>
+      <div class="query-header" onclick="toggleCard('${cardId}')">
+        <div class="query-num">${qi}.</div>
+        <div class="query-text">${query}</div>
         <span class="query-badge">${precDomain.toUpperCase()}</span>
         <span class="query-status ${sc}">${sl}</span>
-        <span class="chevron" id="chev-prec-${gi}">▼</span>
+        <span class="chevron" id="chev-${cardId}">▼</span>
       </div>
-      <div class="query-body" id="prec-${gi}">
-        <div style="margin-top:12px">
-          <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Подзапросы Planner (${(r.subqueries||[]).length}):</div>
-          <div class="subquery-list">${(r.subqueries||[]).map(sq=>`<span class="subquery-tag">${sq}</span>`).join('')}</div>
-        </div>
+      <div class="query-body" id="${cardId}">
         <div style="margin-top:16px">
           <table>
-            <thead><tr><th style="width:40px">#</th><th>Статья</th><th style="width:200px">Релевантность</th></tr></thead>
+            <thead><tr><th style="width:40px">#</th><th>Статья</th><th style="width:90px;font-size:10px;color:var(--text3)">Top-K</th><th style="width:200px">Релевантность</th></tr></thead>
             <tbody>
-              ${arts.map((a,ai)=>{
-                const key=`prec_${gi}_${ai}`, val=RATINGS[key];
+              ${arts.map((a, ai) => {
+                const rkey = precRatingKey(precDomain, query, a.arxiv_id || a.url || a.title);
+                const val = RATINGS[rkey];
+                const topKBadges = Array.from(a.inTopK).sort().map(k=>`<span class="tag">top-${k}</span>`).join('');
+                const safeKey = rkey.replace(/'/g, "\\'");
                 return `<tr>
                   <td style="color:var(--text3);font-size:12px">${ai+1}</td>
                   <td>
@@ -518,11 +544,12 @@ function renderPrecisionContent() {
                       ${a.primary_category?`<span class="tag">${a.primary_category}</span>`:''}
                     </div>
                   </td>
+                  <td>${topKBadges}</td>
                   <td>
                     <div class="rel-group">
-                      <span class="rel-btn ${val==='yes'?'sel-yes':''}" onclick="setPrec(${gi},${ai},'yes');event.stopPropagation()">✓ Да</span>
-                      <span class="rel-btn ${val==='partial'?'sel-partial':''}" onclick="setPrec(${gi},${ai},'partial');event.stopPropagation()">~ Частично</span>
-                      <span class="rel-btn ${val==='no'?'sel-no':''}" onclick="setPrec(${gi},${ai},'no');event.stopPropagation()">✗ Нет</span>
+                      <span class="rel-btn ${val==='yes'?'sel-yes':''}" onclick="setPrec('${safeKey}','yes');event.stopPropagation()">✓ Да</span>
+                      <span class="rel-btn ${val==='partial'?'sel-partial':''}" onclick="setPrec('${safeKey}','partial');event.stopPropagation()">~ Частично</span>
+                      <span class="rel-btn ${val==='no'?'sel-no':''}" onclick="setPrec('${safeKey}','no');event.stopPropagation()">✗ Нет</span>
                     </div>
                   </td>
                 </tr>`;
@@ -537,8 +564,8 @@ function renderPrecisionContent() {
   applyOpenCards();
 }
 
-function setPrec(gi, ai, val) {
-  RATINGS[`prec_${gi}_${ai}`] = val;
+function setPrec(rkey, val) {
+  RATINGS[rkey] = val;
   saveRatings();
   renderPrecisionContent();
 }
@@ -562,9 +589,12 @@ function applyOpenCards() {
 }
 
 function markAllRelevant() {
-  (DATA.results||[]).filter(r=>r.domain===precDomain&&r.top_k===precK).forEach(r=>{
-    const gi = DATA.results.indexOf(r);
-    (r.articles||[]).forEach((_,ai)=>{ RATINGS[`prec_${gi}_${ai}`]='yes'; });
+  const pool = buildArticlePool(precDomain);
+  pool.forEach((qmap, query) => {
+    qmap.forEach((a) => {
+      const k = precRatingKey(precDomain, query, a.arxiv_id || a.url || a.title);
+      RATINGS[k] = 'yes';
+    });
   });
   saveRatings(); renderPrecisionContent();
 }
@@ -573,16 +603,22 @@ function computeRetrieverMetrics() {
   const results = DATA.results || [];
   const metrics = {};
 
+  // Вспомогательная: получить оценку статьи по arxiv_id
+  function getRating(domain, query, a) {
+    const k = precRatingKey(domain, query, a.arxiv_id || a.url || a.title);
+    return RATINGS[k];
+  }
+
   TOP_K_VALUES.forEach(k => {
     let totalPrec=0, totalDCG=0, totalQ=0;
     results.filter(r=>r.top_k===k).forEach(r=>{
-      const gi=results.indexOf(r), arts=r.articles||[];
+      const arts=r.articles||[];
       if(!arts.length) return;
       totalQ++;
       let relCount=0, dcg=0, idcg=0;
       arts.forEach((_,i)=>{ idcg += 1/Math.log2(i+2); });
       arts.forEach((a,ai)=>{
-        const v=RATINGS[`prec_${gi}_${ai}`];
+        const v = getRating(r.domain, r.query, a);
         if(v==='yes'||v==='partial'){ relCount++; dcg+=1/Math.log2(ai+2); }
       });
       totalPrec += relCount/arts.length;
@@ -619,13 +655,12 @@ function computeRetrieverMetrics() {
 
   document.getElementById('retriever-results').innerHTML = html;
   document.getElementById('retriever-results').classList.remove('hide');
-  document.getElementById('ndcg-body').innerHTML = html;
   RATINGS['_retriever_metrics'] = metrics;
   RATINGS['_deltas'] = deltas;
   saveRatings();
 }
 
-// 4. Field Accuracy (top_k=EVAL_TOP_K, has_facts===true) 
+// 4. Extraction Coverage (top_k=EVAL_TOP_K, has_facts===true) 
 let extDomain = DOMAIN_KEYS[0];
 
 function renderExtractorSection() {
@@ -637,16 +672,24 @@ function renderExtractorSection() {
 }
 
 function renderExtractorContent() {
-  // Берём прогоны с top_k=EVAL_TOP_K для данного домена
   const results = (DATA.results||[]).filter(r=>r.domain===extDomain && r.top_k===EVAL_TOP_K);
   const FACT_FIELDS = ['problem','gap','methods','datasets','metrics'];
   const FACT_LABELS = {problem:'Problem',gap:'Gap',methods:'Methods',datasets:'Datasets',metrics:'Metrics'};
 
+  // Вспомогательная: поле непустое?
+  const fieldFilled = (facts, f) => {
+    const v = (facts||{})[f];
+    return Array.isArray(v) ? v.length > 0 : (v && String(v).trim() !== '');
+  };
+
   let html='';
   results.forEach((r,qi)=>{
     const gi = DATA.results.indexOf(r);
-    // Только статьи где has_facts===true
-    const arts = (r.articles_with_facts||[]).filter(a=>a.has_facts===true);
+    // Статьи где хотя бы одно поле извлечено (facts непустой)
+    const arts = (r.articles_with_facts||[]).filter(a => {
+      const f = a.facts || {};
+      return FACT_FIELDS.some(field => fieldFilled(f, field));
+    }).slice(0, 3);
 
     if(!arts.length){
       html+=`<div class="query-card">
@@ -659,39 +702,72 @@ function renderExtractorContent() {
       return;
     }
 
-    const done = arts.filter((a,ai)=>FACT_FIELDS.some(f=>RATINGS[`fact_${gi}_${ai}_${f}`]!==undefined)).length;
-    const sc = done===0?'status-pending':done===arts.length?'status-done':'status-partial';
+    // Считаем готовность: оценено если для всех заполненных полей есть оценка,
+    // и для всех пустых есть ответ на вопрос "есть в абстракте?"
+    const totalActions = arts.reduce((sum,a,ai)=>{
+      const facts=a.facts||{};
+      return sum + FACT_FIELDS.reduce((s,f)=>{
+        if(fieldFilled(facts,f)) return s+1; // нужна оценка точности
+        return s+1; // нужен ответ "есть в абстракте?"
+      },0);
+    },0);
+    const doneActions = arts.reduce((sum,a,ai)=>{
+      const facts=a.facts||{};
+      return sum + FACT_FIELDS.reduce((s,f)=>{
+        const rKey = fieldFilled(facts,f) ? `fact_${gi}_${ai}_${f}` : `fact_abs_${gi}_${ai}_${f}`;
+        return s + (RATINGS[rKey]!==undefined ? 1 : 0);
+      },0);
+    },0);
+    const sc = doneActions===0?'status-pending':doneActions===totalActions?'status-done':'status-partial';
 
     html+=`<div class="query-card">
       <div class="query-header" onclick="toggleCard('ext-${gi}')">
         <div class="query-num">${qi+1}.</div>
         <div class="query-text">${r.query}</div>
         <span class="query-badge">${extDomain.toUpperCase()}</span>
-        <span class="query-status ${sc}">${done}/${arts.length} статей</span>
+        <span class="query-status ${sc}">${doneActions}/${totalActions}</span>
         <span class="chevron" id="chev-ext-${gi}">▼</span>
       </div>
       <div class="query-body" id="ext-${gi}">
-        ${arts.slice(0,3).map((a,ai)=>{
+        ${arts.map((a,ai)=>{
           const facts=a.facts||{};
           return `<div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
             <div style="font-weight:600;font-size:14px;margin-bottom:4px">${a.title||'—'}</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px">${a.abstract||''}</div>
             <div class="facts-grid">
               ${FACT_FIELDS.map(f=>{
-                const val=Array.isArray(facts[f])?facts[f].join(', '):(facts[f]||'—');
-                const rKey=`fact_${gi}_${ai}_${f}`, rv=RATINGS[rKey];
-                return `<div class="fact-item">
-                  <div class="fact-label">${FACT_LABELS[f]}</div>
-                  <div class="fact-value">${val==='—'?'<em style="color:var(--text3)">не извлечено</em>':val}</div>
-                  <div class="fact-accuracy">
-                    <label>Точность:</label>
-                    <div class="acc-btns">
-                      <span class="acc-btn ${rv==='correct'?'sel-correct':''}" onclick="setFact(${gi},${ai},'${f}','correct')">✓ Верно</span>
-                      <span class="acc-btn ${rv==='partial'?'sel-partial':''}" onclick="setFact(${gi},${ai},'${f}','partial')">~ Частично</span>
-                      <span class="acc-btn ${rv==='wrong'?'sel-wrong':''}" onclick="setFact(${gi},${ai},'${f}','wrong')">✗ Неверно</span>
+                const filled = fieldFilled(facts, f);
+                const val = filled ? (Array.isArray(facts[f])?facts[f].join(', '):facts[f]) : null;
+                if(filled){
+                  // Заполненное поле — оцениваем точность
+                  const rKey=`fact_${gi}_${ai}_${f}`, rv=RATINGS[rKey];
+                  return `<div class="fact-item">
+                    <div class="fact-label">${FACT_LABELS[f]}</div>
+                    <div class="fact-value">${val}</div>
+                    <div class="fact-accuracy">
+                      <label>Точность:</label>
+                      <div class="acc-btns">
+                        <span class="acc-btn ${rv==='correct'?'sel-correct':''}" onclick="setFact('fact_${gi}_${ai}_${f}','correct')">✓ Верно</span>
+                        <span class="acc-btn ${rv==='partial'?'sel-partial':''}" onclick="setFact('fact_${gi}_${ai}_${f}','partial')">~ Частично</span>
+                        <span class="acc-btn ${rv==='wrong'?'sel-wrong':''}" onclick="setFact('fact_${gi}_${ai}_${f}','wrong')">✗ Неверно</span>
+                      </div>
                     </div>
-                  </div>
-                </div>`;
+                  </div>`;
+                } else {
+                  // Пустое поле — спрашиваем есть ли в абстракте
+                  const aKey=`fact_abs_${gi}_${ai}_${f}`, av=RATINGS[aKey];
+                  return `<div class="fact-item" style="background:#fdf8f2">
+                    <div class="fact-label">${FACT_LABELS[f]}</div>
+                    <div class="fact-value"><em style="color:var(--text3)">не извлечено</em></div>
+                    <div class="fact-accuracy">
+                      <label style="color:var(--accent)">Есть в абстракте?</label>
+                      <div class="acc-btns">
+                        <span class="acc-btn ${av==='yes'?'sel-correct':''}" onclick="setFact('fact_abs_${gi}_${ai}_${f}','yes')">Да</span>
+                        <span class="acc-btn ${av==='no'?'sel-wrong':''}" onclick="setFact('fact_abs_${gi}_${ai}_${f}','no')">Нет</span>
+                      </div>
+                    </div>
+                  </div>`;
+                }
               }).join('')}
             </div>
           </div>`;
@@ -704,42 +780,113 @@ function renderExtractorContent() {
   applyOpenCards();
 }
 
-function setFact(gi,ai,field,val){
-  RATINGS[`fact_${gi}_${ai}_${field}`]=val;
+function setFact(rkey, val){
+  RATINGS[rkey] = val;
   saveRatings(); renderExtractorContent();
 }
 
 function computeFieldAccuracy(){
   const FACT_FIELDS=['problem','gap','methods','datasets','metrics'];
-  const counts={}, totals={};
-  FACT_FIELDS.forEach(f=>{counts[f]={correct:0,partial:0,wrong:0};totals[f]=0;});
-  Object.entries(RATINGS).forEach(([k,v])=>{
-    if(!k.startsWith('fact_')) return;
-    const parts=k.split('_'), field=parts[parts.length-1];
-    if(!counts[field]) return;
-    totals[field]++; counts[field][v]=(counts[field][v]||0)+1;
+  const FACT_LABELS={problem:'Problem',gap:'Gap',methods:'Methods',datasets:'Datasets',metrics:'Metrics'};
+
+  // Собираем данные по каждому полю
+  const precision = {}; // только заполненные поля
+  const missed = {};    // пустые поля где эксперт сказал "да, есть в абстракте"
+  FACT_FIELDS.forEach(f=>{
+    precision[f]={correct:0,partial:0,wrong:0,total:0};
+    missed[f]=0;
   });
+
+  Object.entries(RATINGS).forEach(([k,v])=>{
+    if(k.startsWith('fact_') && !k.startsWith('fact_abs_')){
+      // Оценка точности заполненного поля: fact_{gi}_{ai}_{field}
+      const parts=k.split('_');
+      const field=parts[parts.length-1];
+      if(!precision[field]) return;
+      precision[field].total++;
+      if(v==='correct') precision[field].correct++;
+      else if(v==='partial') precision[field].partial++;
+      else if(v==='wrong') precision[field].wrong++;
+    } else if(k.startsWith('fact_abs_')){
+      // Вопрос про пустое поле: fact_abs_{gi}_{ai}_{field}
+      const parts=k.split('_');
+      const field=parts[parts.length-1];
+      if(!missed[field]===undefined) return;
+      if(v==='yes') missed[field]++; // было в абстракте но не извлечено
+    }
+  });
+
+  const cls = v => v>=0.7?'val-good':v>=0.4?'val-mid':'val-bad';
+  const pct = v => (v*100).toFixed(1)+'%';
+
+  const rows = FACT_FIELDS.map(f=>{
+    const p = precision[f];
+    const denom_p = p.total || 1;
+    const fp = (p.correct + p.partial*0.5) / denom_p; // Extraction Quality
+    const denom_a = p.total + missed[f];
+    const fa = denom_a > 0 ? (p.correct + p.partial*0.5) / denom_a : null; // Extraction Coverage
+    const delta = fa !== null ? fp - fa : null;
+    return {f, fp, fa, delta, total_p: p.total, missed: missed[f]};
+  });
+
   const html=`
-    <div class="notice notice-success">✓ Field Accuracy вычислена (только статьи с has_facts=true)</div>
+    <div class="notice notice-success">✓ Метрики Extractor вычислены</div>
     <table class="breakdown-table">
-      <thead><tr><th>Поле</th><th>Верно</th><th>Частично</th><th>Неверно</th><th>Accuracy</th></tr></thead>
+      <thead><tr><th>Поле</th><th>Extraction Quality</th><th>Extraction Coverage</th><th>Δ</th><th style="font-size:11px;color:var(--text3)">извлечено / пропущено*</th></tr></thead>
       <tbody>
-        ${FACT_FIELDS.map(f=>{
-          const t=totals[f]||1, c=counts[f];
-          const acc=(c.correct+c.partial*0.5)/t;
-          return `<tr>
-            <td><b>${f}</b></td>
-            <td class="val-good">${((c.correct/t)*100).toFixed(0)}%</td>
-            <td class="val-mid">${((c.partial/t)*100).toFixed(0)}%</td>
-            <td class="val-bad">${((c.wrong/t)*100).toFixed(0)}%</td>
-            <td class="${acc>=0.7?'val-good':acc>=0.4?'val-mid':'val-bad'}">${(acc*100).toFixed(1)}%</td>
-          </tr>`;
-        }).join('')}
+        ${rows.map(({f,fp,fa,delta,total_p,missed:m})=>`<tr>
+          <td><b>${FACT_LABELS[f]}</b></td>
+          <td class="${cls(fp)}">${pct(fp)}</td>
+          <td class="${fa!==null?cls(fa):''}'">${fa!==null?pct(fa):'—'}</td>
+          <td class="${delta!==null?(delta<=0.05?'val-good':delta<=0.15?'val-mid':'val-bad'):''}'">${delta!==null?pct(delta):'—'}</td>
+          <td style="color:var(--text3);font-size:12px">${total_p} / ${m}</td>
+        </tr>`).join('')}
       </tbody>
     </table>`;
-  document.getElementById('extractor-results').innerHTML=html;
+
+  const fullHtml = html + '<div style="font-size:11px;color:var(--text3);margin-top:8px">* извлечено — полей с оценкой точности; пропущено — пустых полей где эксперт подтвердил наличие в абстракте</div>';
+  document.getElementById('extractor-results').innerHTML=fullHtml;
   document.getElementById('extractor-results').classList.remove('hide');
-  RATINGS['_field_accuracy']={counts,totals}; saveRatings();
+
+  // Собираем детализацию по статьям для экспорта
+  const results = DATA.results || [];
+  const details = {}; // { domain -> [ { arxiv_id, title, fields: { problem: 'correct'|null, ... } } ] }
+  DOMAIN_KEYS.forEach(domain => {
+    const run = results.find(r => r.domain === domain && r.top_k === EVAL_TOP_K);
+    if (!run) return;
+    const gi = results.indexOf(run);
+    const arts = (run.articles_with_facts || []).filter(a => {
+      const f = a.facts || {};
+      return FACT_FIELDS.some(field => {
+        const v = f[field];
+        return Array.isArray(v) ? v.length > 0 : (v && String(v).trim() !== '');
+      });
+    }).slice(0, 3);
+    details[domain] = arts.map((a, ai) => {
+      const fields = {};
+      FACT_FIELDS.forEach(f => {
+        const filled = (() => { const v=(a.facts||{})[f]; return Array.isArray(v)?v.length>0:(v&&String(v).trim()!==''); })();
+        if (filled) {
+          fields[f] = RATINGS[`fact_${gi}_${ai}_${f}`] || null;
+        } else {
+          const abs = RATINGS[`fact_abs_${gi}_${ai}_${f}`];
+          fields[f] = abs ? `absent_in_abstract:${abs}` : null;
+        }
+      });
+      return { arxiv_id: a.arxiv_id || null, title: a.title || null, fields };
+    });
+  });
+
+  // Сохраняем компактно для экспорта
+  RATINGS['_extraction_coverage'] = {
+    summary: Object.fromEntries(rows.map(({f,fp,fa,delta})=>[f,{
+      extraction_quality: fp.toFixed(3),
+      extraction_coverage: fa!==null?fa.toFixed(3):null,
+      delta: delta!==null?delta.toFixed(3):null
+    }])),
+    details
+  };
+  saveRatings();
 }
 
 // 5. Topics (top_k=EVAL_TOP_K) 
@@ -855,16 +1002,21 @@ function generateFinalReport(){
   const s=DATA.summary||{};
   const jpr=s.json_parse_rates||{}, tc=s.topic_coherence||{}, ttr=s.time_to_result||{};
   const rm=RATINGS['_retriever_metrics']||{}, deltas=RATINGS['_deltas']||[];
-  const fa=RATINGS['_field_accuracy']||{}, tm=RATINGS['_topic_metrics']||{};
+  const fa=RATINGS['_extraction_coverage']||{}, tm=RATINGS['_topic_metrics']||{};
   const pct=v=>v!=null?(parseFloat(v)*100).toFixed(1)+'%':'—';
   const cls=v=>{const n=parseFloat(v);return n>=0.8?'val-good':n>=0.5?'val-mid':'val-bad';};
   const FACT_FIELDS=['problem','gap','methods','datasets','metrics'];
 
-  const faTable=fa.totals?FACT_FIELDS.map(f=>{
-    const t=fa.totals[f]||1, c=fa.counts?.[f]||{};
-    const acc=(c.correct+c.partial*0.5)/t;
-    return `<tr><td><b>${f}</b></td><td class="${cls(acc)}">${(acc*100).toFixed(1)}%</td></tr>`;
-  }).join(''):'<tr><td colspan="2">Не оценено</td></tr>';
+  const FACT_LABELS_MAP={problem:'Problem',gap:'Gap',methods:'Methods',datasets:'Datasets',metrics:'Metrics'};
+  const faTable=Object.keys(fa).length?FACT_FIELDS.map(f=>{
+    const d=(fa.summary||fa)[f]||{};
+    return `<tr>
+      <td><b>${FACT_LABELS_MAP[f]}</b></td>
+      <td class="${cls(d.extraction_quality||0)}">${pct(d.extraction_quality)}</td>
+      <td class="${cls(d.extraction_coverage||0)}">${pct(d.extraction_coverage)}</td>
+      <td class="${parseFloat(d.delta||0)<=0.05?'val-good':parseFloat(d.delta||0)<=0.15?'val-mid':'val-bad'}">${d.delta!=null?pct(d.delta):'—'}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="4">Не оценено</td></tr>';
 
   document.getElementById('final-body').innerHTML=`
     <div class="notice notice-success">✅ Итоговый отчёт сформирован.</div>
@@ -898,9 +1050,9 @@ function generateFinalReport(){
     </div>
 
     <div class="summary-section">
-      <div class="summary-title">Extractor — Field Accuracy (статьи с has_facts=true, top_k=${EVAL_TOP_K})</div>
+      <div class="summary-title">Extractor — Extraction Quality &amp; Extraction Coverage (top_k=${EVAL_TOP_K})</div>
       <table class="breakdown-table">
-        <thead><tr><th>Поле</th><th>Accuracy (верно + 0.5×частично)</th></tr></thead>
+        <thead><tr><th>Поле</th><th>Extraction Quality</th><th>Extraction Coverage</th><th>Δ</th></tr></thead>
         <tbody>${faTable}</tbody>
       </table>
     </div>
@@ -920,10 +1072,42 @@ function generateFinalReport(){
 
 // Экспорт 
 function exportResults(){
-  const blob=new Blob([JSON.stringify({exported_at:new Date().toISOString(),machine_metrics:DATA?.summary||{},expert_ratings:RATINGS},null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`eval_expert_${new Date().toISOString().slice(0,10)}.json`;
+  const results = DATA.results || [];
+  const ratingVal = v => v === 'yes' ? 1 : v === 'partial' ? 0.5 : v === 'no' ? 0 : null;
+
+  // precision_ratings: для каждого top_k — массив { domain, query, scores: [0/0.5/1/null, ...] }
+  const precision_ratings = {};
+  TOP_K_VALUES.forEach(k => {
+    precision_ratings[`top_${k}`] = results.filter(r => r.top_k === k).map(r => ({
+      domain: r.domain,
+      query: r.query,
+      articles: (r.articles || []).map(a => {
+        const rk = precRatingKey(r.domain, r.query, a.arxiv_id || a.url || a.title);
+        const raw = RATINGS[rk];
+        return { arxiv_id: a.arxiv_id || null, rating: raw || null, score: ratingVal(raw) };
+      })
+    }));
+  });
+
+  // Метрики retriever если вычислены
+  const rm = RATINGS['_retriever_metrics'] || null;
+  const retriever_metrics = rm ? Object.fromEntries(
+    TOP_K_VALUES.map(k => [`top_${k}`, { precision: rm[k]?.precision, ndcg: rm[k]?.ndcg }])
+  ) : null;
+
+  const payload = {
+    exported_at: new Date().toISOString(),
+    machine_metrics: DATA?.summary || {},
+    retriever_metrics,
+    precision_ratings,
+    extraction_coverage: RATINGS['_extraction_coverage'] || null,
+    topic_metrics: RATINGS['_topic_metrics'] || null,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `eval_expert_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
 }
 
