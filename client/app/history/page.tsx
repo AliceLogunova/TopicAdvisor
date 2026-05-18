@@ -12,7 +12,7 @@ interface HistoryItem {
   level?: string;
   term?: number;
   created_at?: string;
-  topics?: { id: number; title: string; rationale?: string; approach?: string; sources?: string; rank?: number; }[];
+  topics?: { id: number; title: string; rationale?: string; approach?: string; datasets?: string; sources?: string; rank?: number; }[];
 }
 
 const LEVEL_LABELS: Record<string, Record<string, string>> = {
@@ -26,7 +26,7 @@ const T = {
     loading: "Загружаем...", empty: "История пуста. Сделайте первый запрос.",
     error: "Не удалось загрузить историю.",
     topics_loading: "Загружаем темы...", no_topics: "Темы не сохранены.",
-    section_why: "ПОЧЕМУ СЕЙЧАС", section_approach: "ПОДХОД", section_sources: "ИСТОЧНИКИ",
+    section_why: "ПОЧЕМУ СЕЙЧАС", section_approach: "ПОДХОД", section_datasets: "ДАТАСЕТЫ", section_sources: "ИСТОЧНИКИ",
     months: "мес.",
   },
   en: {
@@ -34,7 +34,7 @@ const T = {
     loading: "Loading...", empty: "History is empty. Make your first request.",
     error: "Failed to load history.",
     topics_loading: "Loading topics...", no_topics: "No topics saved.",
-    section_why: "WHY NOW", section_approach: "APPROACH", section_sources: "SOURCES",
+    section_why: "WHY NOW", section_approach: "APPROACH", section_datasets: "DATASETS", section_sources: "SOURCES",
     months: "mon.",
   },
 };
@@ -65,7 +65,9 @@ function formatDate(dateStr?: string, lang = "ru") {
 
 function TopicCard({ topic, t }: { topic: NonNullable<HistoryItem["topics"]>[number]; t: typeof T["ru"] }) {
   let sources: string[] = [];
+  let datasets: string[] = [];
   try { sources = topic.sources ? JSON.parse(topic.sources) : []; } catch { sources = []; }
+  try { datasets = topic.datasets ? JSON.parse(topic.datasets) : []; } catch { datasets = []; }
 
   return (
     <div className="rounded-xl border-2 border-blue-400/15 bg-white/3 px-4 py-4 space-y-3">
@@ -85,6 +87,16 @@ function TopicCard({ topic, t }: { topic: NonNullable<HistoryItem["topics"]>[num
         <div className="pl-7">
           <div className="text-xs text-blue-400/50 mb-1 tracking-widest uppercase">{t.section_approach}</div>
           <p className="text-sm text-blue-200/60 leading-relaxed">{topic.approach}</p>
+        </div>
+      )}
+      {datasets.length > 0 && (
+        <div className="pl-7">
+          <div className="text-xs text-blue-400/50 mb-1 tracking-widest uppercase">{t.section_datasets}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {datasets.map((ds, j) => (
+              <span key={j} className="text-xs text-blue-200/60 border border-blue-400/20 px-2 py-0.5 rounded-full">{ds}</span>
+            ))}
+          </div>
         </div>
       )}
       {sources.length > 0 && (

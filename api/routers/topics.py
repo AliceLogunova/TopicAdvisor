@@ -165,6 +165,7 @@ async def get_topics_by_query(
                 "title": t.title,
                 "rationale": t.rationale,
                 "approach": t.approach,
+                "datasets": t.datasets,
                 "sources": t.sources_json,
                 "rank": t.rank,
             }
